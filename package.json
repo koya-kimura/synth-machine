@@ -1,0 +1,42 @@
+{
+  "name": "p5-project-template",
+  "description": "A p5.js-based template for interactive visuals with MIDI, audio, and camera support",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/p5-project-template.git"
+  },
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --config config/eslint.config.js src --ext .ts",
+    "lint:fix": "eslint --config config/eslint.config.js src --ext .ts --fix",
+    "format": "prettier --config config/prettier.config.js --ignore-path config/.prettierignore --write \"src/**/*.ts\"",
+    "format:check": "prettier --config config/prettier.config.js --ignore-path config/.prettierignore --check \"src/**/*.ts\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/p5": "^1.7.6",
+    "@types/webmidi": "^2.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4",
+    "vite-plugin-glsl": "^1.5.5"
+  },
+  "dependencies": {
+    "glslify-import": "^3.1.0",
+    "p5": "^2.0.5"
+  }
+}
