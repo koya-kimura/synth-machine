@@ -4,6 +4,7 @@
  */
 import type { ButtonConfig, FaderButtonMode } from "../../types";
 import { LED_PALETTE } from "./ledPalette";
+import { PRESETS } from "../../synth/presets";
 
 // ========================================
 // ボタン設定
@@ -11,33 +12,39 @@ import { LED_PALETTE } from "./ledPalette";
 
 /**
  * グリッドボタンの設定
- * 必要に応じてページ・行・列を指定してボタンを登録してください。
  */
-export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
-  // プリセット1: 横並び3円
-  {
-    key: "preset1",
-    type: "oneshot",
-    cells: [{ page: 0, row: 0, col: 0 }],
+
+// プリセット用ボタン（動的生成）
+const PRESET_BUTTONS: ButtonConfig[] = PRESETS.map((_, index) => {
+  const row = Math.floor(index / 8); // 0-3の行
+  const col = index % 8;              // 0-7の列
+
+  return {
+    key: `preset${index}`,
+    type: "oneshot" as const,
+    cells: [{ page: 0, row, col }],
     activeColor: LED_PALETTE.CYAN,
     inactiveColor: LED_PALETTE.DIM,
-  },
-  // プリセット2: 縦並び3円
-  {
-    key: "preset2",
-    type: "oneshot",
-    cells: [{ page: 0, row: 0, col: 1 }],
-    activeColor: LED_PALETTE.PINK,
-    inactiveColor: LED_PALETTE.DIM,
-  },
-  // プリセット3: グリッド9円
-  {
-    key: "preset3",
-    type: "oneshot",
-    cells: [{ page: 0, row: 0, col: 2 }],
-    activeColor: LED_PALETTE.GREEN,
-    inactiveColor: LED_PALETTE.DIM,
-  },
+  };
+}).slice(0, 32); // 最大32個まで（4行×8列）
+
+// 他の機能用ボタン（手動で追加）
+const OTHER_BUTTONS: ButtonConfig[] = [
+  // ここに他のボタン設定を追加
+  // 例:
+  // {
+  //   key: "someFeature",
+  //   type: "toggle",
+  //   cells: [{ page: 0, row: 4, col: 0 }],
+  //   activeColor: LED_PALETTE.GREEN,
+  //   inactiveColor: LED_PALETTE.DIM,
+  // },
+];
+
+// 全てのボタンを結合
+export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
+  ...PRESET_BUTTONS,
+  ...OTHER_BUTTONS,
 ];
 
 // ========================================

@@ -4,11 +4,7 @@ import type { AudioMicManager } from "../utils/audio/audioMicManager";
 import type { CaptureManager } from "../utils/capture/captureManager";
 import type { BPMManager } from "../utils/rhythm/bpmManager";
 import { SynthObject } from "../synth/object";
-import {
-  createThreeCirclesPreset,
-  createVerticalCirclesPreset,
-  createGridCirclesPreset
-} from "../synth/presets";
+import { PRESETS } from "../synth/presets";
 
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
@@ -20,12 +16,8 @@ export class VisualComposer {
 
   constructor() {
     this.renderTexture = undefined;
-    // 3つのプリセットを初期化
-    this.presets = [
-      createThreeCirclesPreset,  // プリセット1: 横並び
-      createVerticalCirclesPreset, // プリセット2: 縦並び
-      createGridCirclesPreset,     // プリセット3: グリッド
-    ];
+    // プリセット配列を直接インポート
+    this.presets = PRESETS;
   }
 
   /**
@@ -86,15 +78,11 @@ export class VisualComposer {
     // MIDI入力を1回だけ取得（oneshotは読み取り時に自動リセットされるため）
     const inputs = midiManager.midiInput;
 
-    // MIDIボタンに応じてプリセットをスポーン
-    if (inputs["preset1"]) {
-      this.spawnPreset(p, 0, bpmManager); // プリセット1
-    }
-    if (inputs["preset2"]) {
-      this.spawnPreset(p, 1, bpmManager); // プリセット2
-    }
-    if (inputs["preset3"]) {
-      this.spawnPreset(p, 2, bpmManager); // プリセット3
+    // プリセット配列をループして動的にチェック
+    for (let i = 0; i < this.presets.length; i++) {
+      if (inputs[`preset${i}`]) {
+        this.spawnPreset(p, i, bpmManager);
+      }
     }
 
     // 全SynthObjectを更新
