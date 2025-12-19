@@ -173,6 +173,10 @@ export class APCMiniMK2Manager extends MIDIManager {
           this.inputValues.set(key, initialPattern[0] ?? false);
           break;
         }
+        case "multistate":
+          // multistateタイプ: ステート番号（0, 1, 2, ...）
+          this.inputValues.set(key, 0);
+          break;
       }
     }
   }
@@ -457,6 +461,15 @@ export class APCMiniMK2Manager extends MIDIManager {
           }
           break;
         }
+        case "multistate": {
+          // multistateタイプ: ステートを循環
+          const config = this.buttonConfigs.get(key);
+          const stateCount = config?.stateCount ?? 2;
+          const currentState = this.inputValues.get(key) as number;
+          const nextState = (currentState + 1) % stateCount;
+          this.inputValues.set(key, nextState);
+          break;
+        }
       }
     } else if ((isNoteOff || (isNoteOn && velocity === 0)) && type === "momentary") {
       // ボタン離した（momentaryのみ）
@@ -590,6 +603,19 @@ export class APCMiniMK2Manager extends MIDIManager {
           return config.offColor ?? LED_PALETTE.DIM;
         }
       }
+    case "multistate": {
+      // multistateタイプ: ステートごとに色を変更
+      const config = this.buttonConfigs.get(key);
+      const currentState = currentValue as number;
+      const stateColors = config?.stateColors;
+      
+      if (stateColors && currentState < stateColors.length) {
+        return stateColors[currentState];
+      }
+      
+      // stateColorsが設定されていない場合は fallback
+      return currentState > 0 ? activeColor : inactiveColor;
+    }
       default:
         return LED_PALETTE.OFF;
     }

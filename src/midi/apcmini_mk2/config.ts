@@ -30,15 +30,28 @@ const PRESET_BUTTONS: ButtonConfig[] = PRESETS.map((_, index) => {
 
 // 他の機能用ボタン（手動で追加）
 const OTHER_BUTTONS: ButtonConfig[] = [
-  // ここに他のボタン設定を追加
-  // 例:
-  // {
-  //   key: "someFeature",
-  //   type: "toggle",
-  //   cells: [{ page: 0, row: 4, col: 0 }],
-  //   activeColor: LED_PALETTE.GREEN,
-  //   inactiveColor: LED_PALETTE.DIM,
-  // },
+  // 7行目（row=6）: ルーパー録音/再生ボタン（8個）
+  ...Array.from({ length: 8 }, (_, i) => ({
+    key: `looper${i}_record`,
+    type: "multistate" as const,
+    cells: [{ page: 0, row: 6, col: i }],
+    stateCount: 3,
+    stateColors: [
+      LED_PALETTE.DIM,    // ステート0: OFF
+      LED_PALETTE.RED,    // ステート1: 録音中
+      LED_PALETTE.GREEN,  // ステート2: 再生中
+    ],
+    defaultValue: 0,
+  })),
+
+  // 8行目（row=7）: ルーパークリアボタン（8個）
+  ...Array.from({ length: 8 }, (_, i) => ({
+    key: `looper${i}_clear`,
+    type: "oneshot" as const,
+    cells: [{ page: 0, row: 7, col: i }],
+    activeColor: LED_PALETTE.ORANGE,
+    inactiveColor: LED_PALETTE.DIM,
+  })),
 ];
 
 // 全てのボタンを結合

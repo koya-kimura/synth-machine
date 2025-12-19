@@ -6,7 +6,14 @@
 /**
  * MIDI グリッドやボタンの入力タイプ。
  */
-export type InputType = "radio" | "toggle" | "oneshot" | "momentary" | "random" | "sequence";
+export type InputType =
+  | "radio"      // 複数セルから1つを選択
+  | "toggle"     // ON/OFFトグル
+  | "oneshot"    // 押した瞬間のみON
+  | "momentary"  // 押している間だけON
+  | "random"     // ランダム切り替え
+  | "sequence"   // シーケンスパターン
+  | "multistate"; // 押すたびにステートが変化（0→1→2→...→0）
 
 /**
  * APC Mini MK2 のセル位置（ページ・行・列）を表現する。
@@ -27,12 +34,22 @@ export interface ButtonConfig {
   activeColor?: number;
   inactiveColor?: number;
   defaultValue?: number | boolean;
+
+  // random用
   randomTarget?: string;
   excludeCurrent?: boolean;
+
+  // random, sequence用
   speed?: number;
+
+  // sequence用
   initialPattern?: boolean[];
   onColor?: number;
   offColor?: number;
+
+  // multistate用
+  stateCount?: number;      // ステート数（デフォルト: 2）
+  stateColors?: number[];   // 各ステートの色配列
 }
 
 /**
