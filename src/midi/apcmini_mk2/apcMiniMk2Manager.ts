@@ -224,6 +224,17 @@ export class APCMiniMK2Manager extends MIDIManager {
   // ========================================
 
   /**
+   * ボタンの値を外部から設定する
+   * @param key - ボタンのキー
+   * @param value - 設定する値
+   */
+  public setButtonValue(key: string, value: number | boolean): void {
+    if (this.inputValues.has(key)) {
+      this.inputValues.set(key, value);
+    }
+  }
+
+  /**
    * フレーム更新処理
    * @param beat - 現在のビート数（float値、BPM同期用）
    */
@@ -603,19 +614,19 @@ export class APCMiniMK2Manager extends MIDIManager {
           return config.offColor ?? LED_PALETTE.DIM;
         }
       }
-    case "multistate": {
-      // multistateタイプ: ステートごとに色を変更
-      const config = this.buttonConfigs.get(key);
-      const currentState = currentValue as number;
-      const stateColors = config?.stateColors;
-      
-      if (stateColors && currentState < stateColors.length) {
-        return stateColors[currentState];
+      case "multistate": {
+        // multistateタイプ: ステートごとに色を変更
+        const config = this.buttonConfigs.get(key);
+        const currentState = currentValue as number;
+        const stateColors = config?.stateColors;
+
+        if (stateColors && currentState < stateColors.length) {
+          return stateColors[currentState];
+        }
+
+        // stateColorsが設定されていない場合は fallback
+        return currentState > 0 ? activeColor : inactiveColor;
       }
-      
-      // stateColorsが設定されていない場合は fallback
-      return currentState > 0 ? activeColor : inactiveColor;
-    }
       default:
         return LED_PALETTE.OFF;
     }

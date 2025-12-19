@@ -95,7 +95,7 @@ export class VisualComposer {
       const recordState = inputs[`looper${i}_record`] as number;
       const clearTrigger = inputs[`looper${i}_clear`] as boolean;
 
-      this.handleLooperState(i, recordState, clearTrigger, currentTime, beat);
+      this.handleLooperState(i, recordState, clearTrigger, currentTime, beat, midiManager);
     }
 
     // プリセット配列をループして動的にチェック
@@ -127,7 +127,8 @@ export class VisualComposer {
     recordState: number,
     clearTrigger: boolean,
     currentTime: number,
-    currentBeat: number
+    currentBeat: number,
+    midiManager: APCMiniMK2Manager
   ): void {
     const looper = this.loopers[looperIndex];
 
@@ -135,6 +136,8 @@ export class VisualComposer {
     if (clearTrigger) {
       looper.clear();
       this.previousLooperStates[looperIndex] = 0;
+      // MIDIボタンのステートも0にリセット
+      midiManager.setButtonValue(`looper${looperIndex}_record`, 0);
       return;
     }
 
