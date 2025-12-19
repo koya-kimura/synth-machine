@@ -5,6 +5,7 @@ import type { CaptureManager } from "../utils/capture/captureManager";
 import type { BPMManager } from "../utils/rhythm/bpmManager";
 import { SynthObject } from "../synth/object";
 import { PRESETS } from "../synth/presets";
+import { Looper } from "../synth/looper";
 
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
@@ -14,10 +15,20 @@ export class VisualComposer {
   private synthObjects: SynthObject[] = []; // SynthObjectの配列
   private presets: Array<(p: p5, centerX: number, centerY: number, bpm: number, startTime: number) => SynthObject[]>; // プリセットの配列
 
+  // ルーパー管理
+  private loopers: Looper[] = []; // 8つのルーパー
+  private previousLooperStates: number[] = []; // 前フレームのルーパーステート
+
   constructor() {
     this.renderTexture = undefined;
     // プリセット配列を直接インポート
     this.presets = PRESETS;
+
+    // 8つのルーパーを初期化
+    for (let i = 0; i < 8; i++) {
+      this.loopers.push(new Looper());
+      this.previousLooperStates.push(0);
+    }
   }
 
   /**
@@ -60,7 +71,7 @@ export class VisualComposer {
    *
    * @param p p5 インスタンス。
    * @param midiManager MIDI 状態。
-   * @param _beat 現在のビート。
+   * @param beat 現在のビート。
    * @param _audioManager オーディオマネージャー。
    * @param _captureManager キャプチャマネージャー。
    * @param _font フォント。
@@ -69,7 +80,7 @@ export class VisualComposer {
   update(
     p: p5,
     midiManager: APCMiniMK2Manager,
-    _beat: number,
+    beat: number,
     _audioManager?: AudioMicManager,
     _captureManager?: CaptureManager,
     _font?: p5.Font,
@@ -77,19 +88,105 @@ export class VisualComposer {
   ): void {
     // MIDI入力を1回だけ取得（oneshotは読み取り時に自動リセットされるため）
     const inputs = midiManager.midiInput;
+    const currentTime = p.millis();
+
+    // 各ルーパーのステート管理
+    for (let i = 0; i < 8; i++) {
+      const recordState = inputs[`looper${i}_record`] as number;
+      const clearTrigger = inputs[`looper${i}_clear`] as boolean;
+
+      this.handleLooperState(i, recordState, clearTrigger, currentTime, beat);
+    }
 
     // プリセット配列をループして動的にチェック
     for (let i = 0; i < this.presets.length; i++) {
       if (inputs[`preset${i}`]) {
+        // プリセットをスポーン
         this.spawnPreset(p, i, bpmManager);
+
+        // 録音中のルーパーにイベント記録
+        this.recordToActiveLoopers(i, currentTime, beat);
       }
     }
+
+    // ルーパー再生
+    this.playLoopers(p, bpmManager);
 
     // 全SynthObjectを更新
     this.synthObjects.forEach(obj => obj.update(p));
 
     // 消滅したObjectを配列から削除
     this.synthObjects = this.synthObjects.filter(obj => !obj.isDead());
+  }
+
+  /**
+   * ルーパーのステート変化を処理
+   */
+  private handleLooperState(
+    looperIndex: number,
+    recordState: number,
+    clearTrigger: boolean,
+    currentTime: number,
+    currentBeat: number
+  ): void {
+    const looper = this.loopers[looperIndex];
+
+    // クリア処理
+    if (clearTrigger) {
+      looper.clear();
+      this.previousLooperStates[looperIndex] = 0;
+      return;
+    }
+
+    // 前回のステートと比較
+    const prevState = this.previousLooperStates[looperIndex];
+
+    if (recordState !== prevState) {
+      // ステート変化
+      if (recordState === 1) {
+        // ステート0→1: 録音開始
+        looper.startRecording(currentTime, currentBeat);
+      } else if (recordState === 2) {
+        // ステート1→2: 録音停止＆再生開始
+        looper.stopRecordingAndPlay(currentTime, currentBeat);
+      } else if (recordState === 0) {
+        // ステート2→0: 停止
+        looper.clear();
+      }
+    }
+
+    this.previousLooperStates[looperIndex] = recordState;
+  }
+
+  /**
+   * 録音中のルーパーにイベントを記録
+   */
+  private recordToActiveLoopers(
+    presetIndex: number,
+    currentTime: number,
+    currentBeat: number
+  ): void {
+    for (const looper of this.loopers) {
+      if (looper.getState() === "recording") {
+        looper.recordEvent(presetIndex, currentTime, currentBeat);
+      }
+    }
+  }
+
+  /**
+   * ルーパーを再生
+   */
+  private playLoopers(p: p5, bpmManager?: BPMManager): void {
+    const deltaTime = p.deltaTime;
+
+    for (const looper of this.loopers) {
+      if (looper.getState() === "playing") {
+        const eventsToPlay = looper.getEventsToPlay(p.millis(), deltaTime);
+        for (const presetIndex of eventsToPlay) {
+          this.spawnPreset(p, presetIndex, bpmManager);
+        }
+      }
+    }
   }
 
   /**
