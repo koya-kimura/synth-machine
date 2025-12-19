@@ -6,7 +6,7 @@ import type { SynthParams } from "../synthTypes";
  * プリセット3: 3x3グリッド円
  * 緑系のグラデーションで9つの円をグリッド状に配置
  */
-export const createGridCirclesPreset = (_p: p5, centerX: number, centerY: number, bpm: number, startTime: number): SynthObject[] => {
+export const createGridCirclesPreset = (p: p5, bpm: number, startTime: number): SynthObject[] => {
     const spacing = 80; // 円の間隔
     const objects: SynthObject[] = [];
 
@@ -27,11 +27,14 @@ export const createGridCirclesPreset = (_p: p5, centerX: number, centerY: number
         },
     };
 
+    const centerX = p.width / 2;
+    const centerY = p.height / 2;
+
     // 3x3グリッドで配置
     for (let row = 0; row < 3; row++) {
         for (let col = 0; col < 3; col++) {
             const x = centerX + (col - 1) * spacing;
-            const y = centerY + (row - 1) * spacing;
+            const y =centerY + (row - 1) * spacing;
             const hue = 100 + (row * 3 + col) * 10; // 100-180の範囲で色相を変化
 
             objects.push(new SynthObject(

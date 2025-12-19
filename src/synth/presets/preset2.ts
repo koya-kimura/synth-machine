@@ -6,7 +6,7 @@ import type { SynthParams } from "../synthTypes";
  * プリセット2: 3つ縦並び円
  * ピンク系のグラデーションで3つの円を縦に配置
  */
-export const createVerticalCirclesPreset = (_p: p5, centerX: number, centerY: number, bpm: number, startTime: number): SynthObject[] => {
+export const createVerticalCirclesPreset = (p: p5, bpm: number, startTime: number): SynthObject[] => {
     const spacing = 100; // 円の間隔
     const objects: SynthObject[] = [];
 
@@ -29,8 +29,8 @@ export const createVerticalCirclesPreset = (_p: p5, centerX: number, centerY: nu
 
     // 上の円
     objects.push(new SynthObject(
-        centerX,
-        centerY - spacing,
+        p.width / 2,
+        p.height / 2 - spacing,
         startTime,
         bpm,
         { ...baseParams, colorParams: { hue: 300, saturation: 70, brightness: 95 } },
@@ -39,8 +39,8 @@ export const createVerticalCirclesPreset = (_p: p5, centerX: number, centerY: nu
 
     // 中央の円
     objects.push(new SynthObject(
-        centerX,
-        centerY,
+        p.width / 2,
+        p.height / 2,
         startTime,
         bpm,
         { ...baseParams, colorParams: { hue: 320, saturation: 70, brightness: 95 } },
@@ -49,8 +49,8 @@ export const createVerticalCirclesPreset = (_p: p5, centerX: number, centerY: nu
 
     // 下の円
     objects.push(new SynthObject(
-        centerX,
-        centerY + spacing,
+        p.width / 2,
+        p.height / 2 + spacing,
         startTime,
         bpm,
         { ...baseParams, colorParams: { hue: 340, saturation: 70, brightness: 95 } },

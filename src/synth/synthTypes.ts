@@ -4,15 +4,14 @@
 export type Waveform = 'sine' | 'saw' | 'square' | 'noise';
 
 /**
- * ADSR envelope phases
+ * ADSR envelope phases (ADSRエンベロープのフェーズ)
  */
-export enum ADSRPhase {
-    ATTACK = 'ATTACK',
-    DECAY = 'DECAY',
-    SUSTAIN = 'SUSTAIN',
-    RELEASE = 'RELEASE',
-    DEAD = 'DEAD',
-}
+export type ADSRPhase =
+    | 'ATTACK'    // アタック: 音が立ち上がる
+    | 'DECAY'     // ディケイ: 最大音量から減衰
+    | 'SUSTAIN'   // サスティン: 持続
+    | 'RELEASE'   // リリース: 音が消える
+    | 'DEAD';     // 終了: オブジェクト削除対象
 
 /**
  * Color parameters for SynthObject

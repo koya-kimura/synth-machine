@@ -13,7 +13,7 @@ import { Looper } from "../synth/looper";
 export class VisualComposer {
   private renderTexture: p5.Graphics | undefined; // ビジュアル描画用のオフスクリーンキャンバス
   private synthObjects: SynthObject[] = []; // SynthObjectの配列
-  private presets: Array<(p: p5, centerX: number, centerY: number, bpm: number, startTime: number) => SynthObject[]>; // プリセットの配列
+  private presets: Array<(p: p5, bpm: number, startTime: number) => SynthObject[]>; // プリセットの配列
 
   // ルーパー管理
   private loopers: Looper[] = []; // 8つのルーパー
@@ -232,22 +232,23 @@ export class VisualComposer {
    * @param x X座標 (デフォルト: 中央)
    * @param y Y座標 (デフォルト: 中央)
    */
+  /**
+   * 指定されたプリセットを使用してオブジェクトをスポーン
+   * @param p p5 インスタンス
+   * @param presetIndex プリセットのインデックス
+   * @param bpmManager BPMマネージャー
+   */
   spawnPreset(
     p: p5,
     presetIndex: number,
     bpmManager?: BPMManager,
-    x?: number,
-    y?: number
   ): void {
-    const tex = this.ensureTexture();
-    const posX = x ?? tex.width / 2;
-    const posY = y ?? tex.height / 2;
-    const currentBPM = bpmManager?.getBPM() ?? 120; // BPMManagerからBPMを取得、なければデフォルト120
+    const currentBPM = bpmManager?.getBPM() ?? 120;
 
     // 指定されたプリセットを使用して複数オブジェクトをスポーン
     if (presetIndex >= 0 && presetIndex < this.presets.length) {
       const preset = this.presets[presetIndex];
-      const newObjects = preset(p, posX, posY, currentBPM, p.millis());
+      const newObjects = preset(p, currentBPM, p.millis());
 
       // スポーンされた全オブジェクトを配列に追加
       this.synthObjects.push(...newObjects);

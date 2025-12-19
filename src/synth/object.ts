@@ -1,6 +1,6 @@
 import p5 from "p5";
-import type { SynthParams } from "./synthTypes";
-import { ADSRPhase, beatsToMs } from "./synthTypes";
+import type { SynthParams, ADSRPhase } from "./synthTypes";
+import { beatsToMs } from "./synthTypes";
 
 /**
  * SynthObject - 自律的なシンセサイザービジュアルオブジェクト
@@ -84,7 +84,7 @@ export class SynthObject {
         this.bpm = bpm;
         this.params = params;
         this.baseSize = baseSize;
-        this.currentPhase = ADSRPhase.ATTACK;
+        this.currentPhase = 'ATTACK';
         this.currentLevel = 0;
 
         // ビート単位の時間をミリ秒に変換
@@ -140,7 +140,7 @@ export class SynthObject {
      * @returns DEADフェーズに達した場合true
      */
     isDead(): boolean {
-        return this.currentPhase === ADSRPhase.DEAD;
+        return this.currentPhase === 'DEAD';
     }
 
     // ========================================
@@ -161,23 +161,23 @@ export class SynthObject {
      */
     private updateADSREnvelope(elapsed: number): void {
         switch (this.currentPhase) {
-            case ADSRPhase.ATTACK:
+            case 'ATTACK':
                 this.processAttackPhase(elapsed);
                 break;
 
-            case ADSRPhase.DECAY:
+            case 'DECAY':
                 this.processDecayPhase(elapsed);
                 break;
 
-            case ADSRPhase.SUSTAIN:
+            case 'SUSTAIN':
                 this.processSustainPhase(elapsed);
                 break;
 
-            case ADSRPhase.RELEASE:
+            case 'RELEASE':
                 this.processReleasePhase(elapsed);
                 break;
 
-            case ADSRPhase.DEAD:
+            case 'DEAD':
                 // 何もしない
                 break;
         }
@@ -194,7 +194,7 @@ export class SynthObject {
         } else {
             // Attack完了: Decayフェーズへ移行
             this.currentLevel = 1;
-            this.currentPhase = ADSRPhase.DECAY;
+            this.currentPhase = 'DECAY';
         }
     }
 
@@ -212,7 +212,7 @@ export class SynthObject {
         } else {
             // Decay完了: Sustainフェーズへ移行
             this.currentLevel = this.params.sustainLevel;
-            this.currentPhase = ADSRPhase.SUSTAIN;
+            this.currentPhase = 'SUSTAIN';
         }
     }
 
@@ -226,7 +226,7 @@ export class SynthObject {
             this.currentLevel = this.params.sustainLevel;
         } else {
             // ノート終了: Releaseフェーズへ移行
-            this.currentPhase = ADSRPhase.RELEASE;
+            this.currentPhase = 'RELEASE';
         }
     }
 
@@ -245,7 +245,7 @@ export class SynthObject {
         } else {
             // Release完了: DEADフェーズへ移行
             this.currentLevel = 0;
-            this.currentPhase = ADSRPhase.DEAD;
+            this.currentPhase = 'DEAD';
         }
     }
 
