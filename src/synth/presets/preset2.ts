@@ -1,60 +1,49 @@
 import p5 from "p5";
-import { SynthObject } from "../object";
+import { BaseSynthObject, RectSynthObject, type RectParams } from "../object";
 import type { SynthParams } from "../synthTypes";
 
 /**
- * プリセット2: 3つ縦並び円
- * ピンク系のグラデーションで3つの円を縦に配置
+ * プリセット2: 水平に伸縮する長方形
+ * 細長い長方形が左右に伸びるアニメーション
  */
-export const createVerticalCirclesPreset = (p: p5, bpm: number, startTime: number): SynthObject[] => {
-    const spacing = 100; // 円の間隔
-    const objects: SynthObject[] = [];
+export const createVerticalCirclesPreset = (p: p5, bpm: number, startTime: number): BaseSynthObject[] => {
+    const objects: BaseSynthObject[] = [];
 
-    // 全ての円の基本パラメータ
-    const baseParams: SynthParams = {
-        attackTime: 0.4,
-        decayTime: 0.4,
-        sustainLevel: 0.7,
+    // シンセパラメータ
+    const synthParams: SynthParams = {
+        attackTime: 0.5,
+        decayTime: 0.2,
+        sustainLevel: 0.8,
         releaseTime: 1.0,
-        noteDuration: 2.5,
+        noteDuration: 2.0,
         waveform: 'sine',
-        lfoRate: 3.0,
-        lfoDepth: 8,
+        lfoRate: 2,
+        lfoDepth: 5,
         colorParams: {
-            hue: 320,
-            saturation: 70,
-            brightness: 95,
+            hue: 320,       // ピンク
+            saturation: 80,
+            brightness: 100,
         },
     };
 
-    // 上の円
-    objects.push(new SynthObject(
-        p.width / 2,
-        p.height / 2 - spacing,
-        startTime,
-        bpm,
-        { ...baseParams, colorParams: { hue: 300, saturation: 70, brightness: 95 } },
-        45
-    ));
+    // 長方形パラメータ（水平に伸縮）
+    const rectParams: RectParams = {
+        baseWidth: 200,
+        baseHeight: 30,
+        stretchMode: 'horizontal',
+        lfoWidthRate: 1.5,
+        lfoWidthDepth: 80,
+        lfoHeightRate: 3,
+        lfoHeightDepth: 10,
+    };
 
-    // 中央の円
-    objects.push(new SynthObject(
+    objects.push(new RectSynthObject(
         p.width / 2,
         p.height / 2,
         startTime,
         bpm,
-        { ...baseParams, colorParams: { hue: 320, saturation: 70, brightness: 95 } },
-        45
-    ));
-
-    // 下の円
-    objects.push(new SynthObject(
-        p.width / 2,
-        p.height / 2 + spacing,
-        startTime,
-        bpm,
-        { ...baseParams, colorParams: { hue: 340, saturation: 70, brightness: 95 } },
-        45
+        synthParams,
+        rectParams
     ));
 
     return objects;

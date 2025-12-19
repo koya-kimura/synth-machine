@@ -1,15 +1,14 @@
 import p5 from "p5";
-import { SynthObject } from "../object";
-import type { SynthParams } from "../synthTypes";
+import { BaseSynthObject, CircleSynthObject } from "../object";
 
 /**
- * プリセット1: 3つ横並び円
- * 水色系のグラデーションで3つの円を横に配置
+ * プリセット1: シンプルな円
+ * 水色系の円を画面中央に配置
  */
-export const createThreeCirclesPreset = (p: p5, bpm: number, startTime: number): SynthObject[] => {
-    const objects: SynthObject[] = [];
+export const createThreeCirclesPreset = (p: p5, bpm: number, startTime: number): BaseSynthObject[] => {
+    const objects: BaseSynthObject[] = [];
 
-    objects.push(new SynthObject(
+    objects.push(new CircleSynthObject(
         p.width / 2,  // 画面中央X
         p.height / 2, // 画面中央Y
         startTime,

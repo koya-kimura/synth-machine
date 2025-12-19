@@ -3,7 +3,7 @@ import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
 import type { AudioMicManager } from "../utils/audio/audioMicManager";
 import type { CaptureManager } from "../utils/capture/captureManager";
 import type { BPMManager } from "../utils/rhythm/bpmManager";
-import { SynthObject } from "../synth/object";
+import { BaseSynthObject } from "../synth/object";
 import { PRESETS } from "../synth/presets";
 import { Looper } from "../synth/looper";
 import { PatternPlayer } from "../synth/patterns/patternPlayer";
@@ -14,8 +14,8 @@ import { PRESET_PATTERNS } from "../synth/patterns/presetPatterns";
  */
 export class VisualComposer {
   private renderTexture: p5.Graphics | undefined; // ビジュアル描画用のオフスクリーンキャンバス
-  private synthObjects: SynthObject[] = []; // SynthObjectの配列
-  private presets: Array<(p: p5, bpm: number, startTime: number) => SynthObject[]>; // プリセットの配列
+  private synthObjects: BaseSynthObject[] = []; // SynthObjectの配列
+  private presets: Array<(p: p5, bpm: number, startTime: number) => BaseSynthObject[]>; // プリセットの配列
 
   // ルーパー管理
   private loopers: Looper[] = []; // 8つのルーパー
