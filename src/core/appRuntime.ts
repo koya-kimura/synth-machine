@@ -177,6 +177,7 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
           audioManager,
           captureManager,
           font,
+          visualComposer,
         };
         uiManager.draw(uiContext);
       } else {

@@ -122,4 +122,11 @@ export class Looper {
             return "idle";
         }
     }
+
+    /**
+     * 記録されているイベント数を取得
+     */
+    getEventCount(): number {
+        return this.events.length;
+    }
 }

@@ -1,10 +1,10 @@
 import p5 from "p5";
 import type { VisualRenderContext } from "../types/render"; // 描画コンテキストの型定義
 import type { UIDrawFunction } from "../ui/uiDrawers"; // UI描画関数の型定義
-import { uiNone, uiDebug } from "../ui/uiDrawers"; // UI描画関数の実装
+import { uiNone, uiDebug, uiInfo } from "../ui/uiDrawers"; // UI描画関数の実装
 
 // UI描画関数の配列。MIDI入力に基づいて選択される。
-const UI_DRAWERS: readonly UIDrawFunction[] = [uiDebug];
+const UI_DRAWERS: readonly UIDrawFunction[] = [uiInfo];
 
 /**
  * UIManager は UI オーバーレイ用の `p5.Graphics` を管理する。
@@ -54,7 +54,7 @@ export class UIManager {
     texture.resizeCanvas(p.width, p.height);
   }
 
-  update(_p: p5): void {}
+  update(_p: p5): void { }
 
   /**
    * UI 描画を行い、MIDI の状態に応じたパターンを選択する。

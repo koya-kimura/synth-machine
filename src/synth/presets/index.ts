@@ -1,10 +1,6 @@
 /**
  * プリセットのエクスポート
  */
-export { createThreeCirclesPreset } from "./preset1";
-export { createVerticalCirclesPreset } from "./preset2";
-export { createGridCirclesPreset } from "./preset3";
-
 import { createThreeCirclesPreset } from "./preset1";
 import { createVerticalCirclesPreset } from "./preset2";
 import { createGridCirclesPreset } from "./preset3";

@@ -271,4 +271,44 @@ export class VisualComposer {
     this.renderTexture?.remove();
     this.renderTexture = undefined;
   }
+
+  /**
+   * デバッグ情報: 現在のSynthObject数を取得
+   */
+  public getObjectCount(): number {
+    return this.synthObjects.length;
+  }
+
+  /**
+   * デバッグ情報: ルーパー情報を取得
+   */
+  public getLooperInfo(): Array<{ index: number; state: string; eventCount: number }> {
+    return this.loopers.map((looper, index) => ({
+      index,
+      state: looper.getState(),
+      eventCount: looper.getEventCount(),
+    }));
+  }
+
+
+  /**
+   * デバッグ情報: シンセサイザーパラメータを取得
+   */
+  public getSynthParameters(): Array<{
+    attack: number;
+    decay: number;
+    sustain: number;
+    release: number;
+    frequency: number;
+    amplitude: number;
+  }> {
+    return this.synthObjects.map(obj => ({
+      attack: obj.attack,
+      decay: obj.decay,
+      sustain: obj.sustain,
+      release: obj.release,
+      frequency: obj.frequency,
+      amplitude: obj.amplitude,
+    }));
+  }
 }
