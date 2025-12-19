@@ -6,6 +6,8 @@ import type { BPMManager } from "../utils/rhythm/bpmManager";
 import { SynthObject } from "../synth/object";
 import { PRESETS } from "../synth/presets";
 import { Looper } from "../synth/looper";
+import { PatternPlayer } from "../synth/patterns/patternPlayer";
+import { PRESET_PATTERNS } from "../synth/patterns/presetPatterns";
 
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
@@ -19,10 +21,22 @@ export class VisualComposer {
   private loopers: Looper[] = []; // 8つのルーパー
   private previousLooperStates: number[] = []; // 前フレームのルーパーステート
 
+  // パターン再生管理
+  private patternPlayers: PatternPlayer[] = [];
+  private activePatterns: boolean[] = []; // 各パターンのアクティブ状態
+
+
   constructor() {
     this.renderTexture = undefined;
     // プリセット配列を直接インポート
     this.presets = PRESETS;
+
+    // PatternPlayerを初期化
+    for (let i = 0; i < PRESET_PATTERNS.length; i++) {
+      this.patternPlayers.push(new PatternPlayer());
+      this.patternPlayers[i].setPattern(PRESET_PATTERNS[i]);
+      this.activePatterns.push(false);
+    }
 
     // 8つのルーパーを初期化
     for (let i = 0; i < 8; i++) {
@@ -90,9 +104,27 @@ export class VisualComposer {
     const inputs = midiManager.midiInput;
     const currentTime = p.millis();
 
-    // 各ルーパーのステート管理
+
+    // パターン選択処理（複数同時選択可能）
+    for (let i = 0; i < PRESET_PATTERNS.length; i++) {
+      const patternState = inputs[`pattern${i}`] as boolean;
+
+      this.activePatterns[i] = patternState;
+      if (patternState) {
+        // パターンがON: 再生
+        const eventsToPlay = this.patternPlayers[i].getEventsToPlay(beat);
+        for (const presetIndex of eventsToPlay) {
+          this.spawnPreset(p, presetIndex, bpmManager);
+        }
+      } else {
+        // パターンがOFF: リセット
+        this.patternPlayers[i].reset();
+      }
+    }
+
     for (let i = 0; i < 8; i++) {
       const recordState = inputs[`looper${i}_record`] as number;
+
       const clearTrigger = inputs[`looper${i}_clear`] as boolean;
 
       this.handleLooperState(i, recordState, clearTrigger, currentTime, beat, midiManager);
@@ -311,5 +343,27 @@ export class VisualComposer {
       frequency: obj.frequency,
       amplitude: obj.amplitude,
     }));
+  }
+
+  /**
+   * デバッグ情報: 選択中のパターン名を取得
+   */
+  public getSelectedPatternName(): string | null {
+    return this.getActivePatternNames();
+  }
+
+  /**
+   * アクティブなパターン名の一覧を取得
+   */
+  private getActivePatternNames(): string | null {
+    const activeNames: string[] = [];
+    for (let i = 0; i < PRESET_PATTERNS.length; i++) {
+      if (!this.activePatterns[i]) continue;
+      const name = this.patternPlayers[i].getCurrentPatternName();
+      if (name) {
+        activeNames.push(name);
+      }
+    }
+    return activeNames.length > 0 ? activeNames.join(", ") : null;
   }
 }

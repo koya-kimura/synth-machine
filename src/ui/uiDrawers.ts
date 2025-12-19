@@ -274,6 +274,7 @@ export const uiDebug: UIDrawFunction = (
   // 左上：ルーパー情報（シンプルなテキストのみ）
   const infoLines = [
     `Active Objects: ${objectCount}`,
+    `Pattern: ${visualComposer.getSelectedPatternName() || "None"}`,
     "",
     "Loopers:",
   ];

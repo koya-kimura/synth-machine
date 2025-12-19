@@ -6,6 +6,7 @@ import type { ButtonConfig, FaderButtonMode } from "../../types";
 import { LED_PALETTE } from "./ledPalette";
 import { PRESETS } from "../../synth/presets";
 
+import { PRESET_PATTERNS } from "../../synth/patterns/presetPatterns";
 // ========================================
 // ボタン設定
 // ========================================
@@ -23,10 +24,21 @@ const PRESET_BUTTONS: ButtonConfig[] = PRESETS.map((_, index) => {
     key: `preset${index}`,
     type: "oneshot" as const,
     cells: [{ page: 0, row, col }],
-    activeColor: LED_PALETTE.CYAN,
-    inactiveColor: LED_PALETTE.DIM,
+    activeColor: LED_PALETTE.ON,
+    inactiveColor: LED_PALETTE.CYAN,
   };
 }).slice(0, 32); // 最大32個まで（4行×8列）
+
+// パターン選択ボタン（5行目・6行目）
+const PATTERN_BUTTONS: ButtonConfig[] = PRESET_PATTERNS.map((_, index) => {
+  return {
+    key: `pattern${index}`,
+    type: "toggle" as const,
+    cells: [{ page: 0, row: 4 + Math.floor(index / 8), col: index % 8 }],
+    activeColor: LED_PALETTE.PINK,
+    inactiveColor: LED_PALETTE.YELLOW,
+  }
+}).slice(0, 16);
 
 // 他の機能用ボタン（手動で追加）
 const OTHER_BUTTONS: ButtonConfig[] = [
@@ -37,7 +49,7 @@ const OTHER_BUTTONS: ButtonConfig[] = [
     cells: [{ page: 0, row: 6, col: i }],
     stateCount: 3,
     stateColors: [
-      LED_PALETTE.DIM,    // ステート0: OFF
+      LED_PALETTE.CYAN,    // ステート0: OFF
       LED_PALETTE.RED,    // ステート1: 録音中
       LED_PALETTE.GREEN,  // ステート2: 再生中
     ],
@@ -49,14 +61,15 @@ const OTHER_BUTTONS: ButtonConfig[] = [
     key: `looper${i}_clear`,
     type: "oneshot" as const,
     cells: [{ page: 0, row: 7, col: i }],
-    activeColor: LED_PALETTE.ORANGE,
-    inactiveColor: LED_PALETTE.DIM,
+    activeColor: LED_PALETTE.DIM,
+    inactiveColor: LED_PALETTE.RED,
   })),
 ];
 
 // 全てのボタンを結合
 export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
   ...PRESET_BUTTONS,
+  ...PATTERN_BUTTONS,
   ...OTHER_BUTTONS,
 ];
 
