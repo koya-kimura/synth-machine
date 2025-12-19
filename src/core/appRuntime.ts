@@ -210,6 +210,9 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
       if (p.keyCode === 32) {
         p.fullscreen(true); // スペースキーでフルスクリーン
       }
+      if (p.keyCode === 13) {
+        bpmManager.tapTempo();
+      }
       // オーディオコンテキストを再開（ユーザー操作が必要）
       audioManager?.resume().catch(() => undefined);
     },

@@ -3,19 +3,14 @@ import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager"; 
 import type { AudioMicManager } from "../utils/audio/audioMicManager"; // オーディオ入力管理クラス
 import type { CaptureManager } from "../utils/capture/captureManager"; // カメラキャプチャ管理クラス
 
-import { sampleScene } from "../visuals/sampleScene";
-
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
  */
 export class VisualComposer {
   private renderTexture: p5.Graphics | undefined; // ビジュアル描画用のオフスクリーンキャンバス
 
-  private sampleScene: sampleScene;
-
   constructor() {
     this.renderTexture = undefined;
-    this.sampleScene = new sampleScene();
   }
 
   /**
@@ -104,7 +99,6 @@ export class VisualComposer {
     // サンプル描画（赤い円）
     tex.push();
     tex.background(0);
-    this.sampleScene.draw(ctx);
     tex.pop();
   }
 

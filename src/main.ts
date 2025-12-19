@@ -6,8 +6,8 @@ import { createAppRuntime } from "./core/appRuntime";
 // sketch は p5 インスタンスモードで実行されるエントリー関数。
 const sketch = (p: p5) => {
   const runtime = createAppRuntime({
-    enableAudio: true,
-    enableCapture: true,
+    enableAudio: false,
+    enableCapture: false,
   });
 
   // setup は一度だけ呼ばれ、レンダーターゲットとシェーダーを初期化する。
