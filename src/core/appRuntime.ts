@@ -163,8 +163,8 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
       midiManager.update(beat);
 
       // ビジュアルの更新と描画
-      visualComposer.update(p, midiManager, beat, audioManager, captureManager, visualFont);
-      visualComposer.draw(p, midiManager, beat, audioManager, captureManager, visualFont);
+      visualComposer.update(p, midiManager, beat, audioManager, captureManager, visualFont, bpmManager);
+      visualComposer.draw(p, midiManager, beat, audioManager, captureManager, visualFont, bpmManager);
 
       // UIの描画（アセットが読み込まれていれば）
       const { font, logo } = context.assets;

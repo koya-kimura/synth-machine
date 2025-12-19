@@ -113,7 +113,7 @@ export class APCMiniMK2Manager extends MIDIManager {
         const existing = this.cellRegistry.get(cellKey)!;
         throw new Error(
           `セル (page=${page}, row=${cell.row}, col=${cell.col}) は既に "${existing.key}" に登録されています。` +
-            `"${key}" を登録できません。`,
+          `"${key}" を登録できません。`,
         );
       }
     }
@@ -194,6 +194,7 @@ export class APCMiniMK2Manager extends MIDIManager {
   /**
    * MIDI入力値を取得する
    * radioタイプは数値、それ以外はbooleanを返す
+   * oneshotタイプは読み取り時に自動的にリセットされる
    */
   get midiInput(): Record<string, MidiInputValue> {
     const result: Record<string, MidiInputValue> = {};
@@ -204,6 +205,11 @@ export class APCMiniMK2Manager extends MIDIManager {
         result[key] = typeof value === "number" ? value : 0;
       } else {
         result[key] = value;
+      }
+
+      // oneshotタイプは読み取り後に自動的にリセット
+      if (config?.type === "oneshot" && value === true) {
+        this.inputValues.set(key, false);
       }
     }
     return result;
@@ -218,9 +224,6 @@ export class APCMiniMK2Manager extends MIDIManager {
    * @param beat - 現在のビート数（float値、BPM同期用）
    */
   public update(beat: number): void {
-    // oneshotをリセット
-    this.resetOneshotValues();
-
     // randomタイプのbeat同期処理
     this.updateRandomSync(beat);
 
@@ -232,17 +235,6 @@ export class APCMiniMK2Manager extends MIDIManager {
 
     // LED出力
     this.midiOutputSendControls();
-  }
-
-  /**
-   * oneshotタイプの値をリセット
-   */
-  private resetOneshotValues(): void {
-    for (const [key, config] of this.buttonConfigs) {
-      if (config.type === "oneshot") {
-        this.inputValues.set(key, false);
-      }
-    }
   }
 
   /**

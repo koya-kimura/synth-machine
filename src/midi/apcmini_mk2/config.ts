@@ -14,6 +14,30 @@ import { LED_PALETTE } from "./ledPalette";
  * 必要に応じてページ・行・列を指定してボタンを登録してください。
  */
 export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
+  // プリセット1: 横並び3円
+  {
+    key: "preset1",
+    type: "oneshot",
+    cells: [{ page: 0, row: 0, col: 0 }],
+    activeColor: LED_PALETTE.CYAN,
+    inactiveColor: LED_PALETTE.DIM,
+  },
+  // プリセット2: 縦並び3円
+  {
+    key: "preset2",
+    type: "oneshot",
+    cells: [{ page: 0, row: 0, col: 1 }],
+    activeColor: LED_PALETTE.PINK,
+    inactiveColor: LED_PALETTE.DIM,
+  },
+  // プリセット3: グリッド9円
+  {
+    key: "preset3",
+    type: "oneshot",
+    cells: [{ page: 0, row: 0, col: 2 }],
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.DIM,
+  },
 ];
 
 // ========================================
