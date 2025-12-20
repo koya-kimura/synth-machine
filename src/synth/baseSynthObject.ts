@@ -1,11 +1,12 @@
 import p5 from "p5";
-import type { SynthParams, ADSRPhase } from "./synthTypes";
+import type { SynthParams, ADSRPhase, MovementParams, EasingFunction } from "./synthTypes";
 import { beatsToMs } from "./synthTypes";
+import { linear } from "../utils/math/easing";
 
 /**
  * BaseSynthObject - シンセサイザービジュアルオブジェクトの基底クラス
  * 
- * ADSRエンベロープ、LFO、ライフサイクル管理など、
+ * ADSRエンベロープ、LFO、ライフサイクル管理、移動など、
  * 全ての図形タイプで共通する機能を提供します。
  * 
  * 具体的な描画は派生クラスで実装します。
@@ -15,11 +16,17 @@ export abstract class BaseSynthObject {
     // プロテクテッドプロパティ（派生クラスからアクセス可能）
     // ========================================
 
-    /** 描画位置: X座標 */
+    /** 描画位置: X座標（現在の位置） */
     protected x: number;
 
-    /** 描画位置: Y座標 */
+    /** 描画位置: Y座標（現在の位置） */
     protected y: number;
+
+    /** 開始位置: X座標 */
+    protected startX: number;
+
+    /** 開始位置: Y座標 */
+    protected startY: number;
 
     /** オブジェクト生成時刻（ミリ秒） */
     protected startTime: number;
@@ -55,6 +62,16 @@ export abstract class BaseSynthObject {
     /** ノート継続時間（ミリ秒） */
     protected noteDurationMs: number;
 
+    // 移動パラメータ
+    /** 移動パラメータ（オプショナル） */
+    protected movementParams: MovementParams | undefined;
+
+    /** 全生存時間（Attack開始〜Release終了、ミリ秒） */
+    protected totalLifetimeMs: number;
+
+    /** イージング関数 */
+    protected easingFunction: EasingFunction;
+
     // ========================================
     // コンストラクタ
     // ========================================
@@ -68,6 +85,7 @@ export abstract class BaseSynthObject {
      * @param bpm - BPM
      * @param params - シンセサイザーパラメータ
      * @param baseSize - 基本サイズ（デフォルト: 50）
+     * @param movementParams - 移動パラメータ（オプショナル）
      */
     constructor(
         x: number,
@@ -75,16 +93,20 @@ export abstract class BaseSynthObject {
         startTime: number,
         bpm: number,
         params: SynthParams,
-        baseSize: number = 50
+        baseSize: number = 50,
+        movementParams?: MovementParams
     ) {
         this.x = x;
         this.y = y;
+        this.startX = x;
+        this.startY = y;
         this.startTime = startTime;
         this.bpm = bpm;
         this.params = params;
         this.baseSize = baseSize;
         this.currentPhase = 'ATTACK';
         this.currentLevel = 0;
+        this.movementParams = movementParams;
 
         // インスタンス固有のランダムシードを生成
         this.randomSeed = Math.random() * 10000;
@@ -94,6 +116,12 @@ export abstract class BaseSynthObject {
         this.decayMs = beatsToMs(params.decayTime, bpm);
         this.releaseMs = beatsToMs(params.releaseTime, bpm);
         this.noteDurationMs = beatsToMs(params.noteDuration, bpm);
+
+        // 全生存時間を計算（Attack開始〜Release終了）
+        this.totalLifetimeMs = this.noteDurationMs + this.releaseMs;
+
+        // イージング関数を設定（デフォルト: linear）
+        this.easingFunction = movementParams?.easing ?? linear;
     }
 
     // ========================================
@@ -108,6 +136,7 @@ export abstract class BaseSynthObject {
     update(p: p5): void {
         const elapsed = p.millis() - this.startTime;
         this.updateADSREnvelope(elapsed);
+        this.updatePosition(p, elapsed);
     }
 
     /**
@@ -205,6 +234,47 @@ export abstract class BaseSynthObject {
             this.currentLevel = 0;
             this.currentPhase = 'DEAD';
         }
+    }
+
+    // ========================================
+    // プロテクテッドメソッド: 移動計算
+    // ========================================
+
+    /**
+     * 位置を更新
+     * 
+     * @param p - p5インスタンス
+     * @param elapsed - 生成からの経過時間（ミリ秒）
+     */
+    protected updatePosition(p: p5, elapsed: number): void {
+        if (!this.movementParams) {
+            return; // 移動パラメータがなければ何もしない
+        }
+
+        // 進行度を計算（0〜1）
+        const rawProgress = Math.min(1, elapsed / this.totalLifetimeMs);
+        const progress = this.easingFunction(rawProgress);
+
+        // 現在の移動距離
+        const currentDistance = this.movementParams.distance * progress;
+
+        // 角度を計算（度→ラジアン）
+        let angle = this.movementParams.angle;
+
+        // 角度LFOを適用
+        if (this.movementParams.angleLFO) {
+            const time = elapsed / 1000; // 秒単位
+            const angleLFOValue = Math.sin(time * this.movementParams.angleLFORate * Math.PI * 2)
+                * this.movementParams.angleLFODepth;
+            angle += angleLFOValue;
+        }
+
+        // 角度をラジアンに変換
+        const angleRad = (angle * Math.PI) / 180;
+
+        // 新しい位置を計算
+        this.x = this.startX + Math.cos(angleRad) * currentDistance;
+        this.y = this.startY + Math.sin(angleRad) * currentDistance;
     }
 
     // ========================================

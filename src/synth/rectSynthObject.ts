@@ -1,5 +1,5 @@
 import p5 from "p5";
-import type { SynthParams } from "./synthTypes";
+import type { SynthParams, MovementParams } from "./synthTypes";
 import { BaseSynthObject } from "./baseSynthObject";
 
 /**
@@ -41,6 +41,7 @@ export class RectSynthObject extends BaseSynthObject {
      * @param bpm - BPM
      * @param params - シンセサイザーパラメータ
      * @param rectParams - 長方形固有のパラメータ
+     * @param movementParams - 移動パラメータ（オプショナル）
      */
     constructor(
         x: number,
@@ -48,10 +49,11 @@ export class RectSynthObject extends BaseSynthObject {
         startTime: number,
         bpm: number,
         params: SynthParams,
-        rectParams: RectParams
+        rectParams: RectParams,
+        movementParams?: MovementParams
     ) {
         // baseSizeは使用しないが、互換性のため0を渡す
-        super(x, y, startTime, bpm, params, 0);
+        super(x, y, startTime, bpm, params, 0, movementParams);
         this.rectParams = rectParams;
     }
 

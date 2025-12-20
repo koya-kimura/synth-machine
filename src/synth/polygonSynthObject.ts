@@ -1,5 +1,5 @@
 import p5 from "p5";
-import type { SynthParams } from "./synthTypes";
+import type { SynthParams, MovementParams } from "./synthTypes";
 import { BaseSynthObject } from "./baseSynthObject";
 
 /**
@@ -56,6 +56,7 @@ export class PolygonSynthObject extends BaseSynthObject {
      * @param bpm - BPM
      * @param params - シンセサイザーパラメータ
      * @param polygonParams - 多角形固有のパラメータ
+     * @param movementParams - 移動パラメータ（オプショナル）
      */
     constructor(
         x: number,
@@ -63,9 +64,10 @@ export class PolygonSynthObject extends BaseSynthObject {
         startTime: number,
         bpm: number,
         params: SynthParams,
-        polygonParams: PolygonParams
+        polygonParams: PolygonParams,
+        movementParams?: MovementParams
     ) {
-        super(x, y, startTime, bpm, params, polygonParams.baseRadius);
+        super(x, y, startTime, bpm, params, polygonParams.baseRadius, movementParams);
         this.polygonParams = polygonParams;
 
         // 頂点情報を生成

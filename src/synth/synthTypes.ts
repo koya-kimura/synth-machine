@@ -38,6 +38,31 @@ export interface SynthParams {
 }
 
 /**
+ * イージング関数の型
+ * 0〜1の入力を受け取り、0〜1の出力を返す
+ */
+export type EasingFunction = (x: number) => number;
+
+/**
+ * Movement parameters for SynthObject
+ * オブジェクトの移動を制御するパラメータ
+ */
+export interface MovementParams {
+    /** 移動角度（度、0=右、90=下、180=左、270=上） */
+    angle: number;
+    /** 移動距離（ピクセル） */
+    distance: number;
+    /** 角度LFOを有効化 */
+    angleLFO: boolean;
+    /** 角度LFOレート（Hz） */
+    angleLFORate: number;
+    /** 角度LFO深度（度） */
+    angleLFODepth: number;
+    /** イージング関数（デフォルト: linear） */
+    easing?: EasingFunction;
+}
+
+/**
  * Convert beats to milliseconds based on BPM
  * @param beats Number of beats
  * @param bpm Beats per minute
@@ -46,3 +71,4 @@ export interface SynthParams {
 export function beatsToMs(beats: number, bpm: number): number {
     return (beats * 60000) / bpm;
 }
+

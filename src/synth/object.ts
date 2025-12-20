@@ -13,5 +13,9 @@ export { CircleSynthObject } from "./circleSynthObject";
 export { RectSynthObject, type RectParams } from "./rectSynthObject";
 export { PolygonSynthObject, type PolygonParams } from "./polygonSynthObject";
 
+// 型のエクスポート
+export type { MovementParams, EasingFunction } from "./synthTypes";
+
 // 後方互換性のため、CircleSynthObjectをSynthObjectとしてエクスポート
 export { CircleSynthObject as SynthObject } from "./circleSynthObject";
+

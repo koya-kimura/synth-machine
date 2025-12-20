@@ -63,6 +63,91 @@ Level
 
 ---
 
+## 移動機能（MovementParams）
+
+全ての図形タイプで使用できるオプショナルな移動機能です。
+Attack開始からRelease終了までの間に、指定した角度・距離で移動します。
+
+### MovementParams
+
+```typescript
+interface MovementParams {
+    angle: number;           // 移動角度（度、0=右、90=下、180=左、270=上）
+    distance: number;        // 移動距離（ピクセル）
+    angleLFO: boolean;       // 角度LFOを有効化
+    angleLFORate: number;    // 角度LFOレート（Hz）
+    angleLFODepth: number;   // 角度LFO深度（度）
+    easing?: EasingFunction; // イージング関数（デフォルト: linear）
+}
+```
+
+### パラメータ詳細
+
+#### angle（移動角度）
+- `0`: 右
+- `90`: 下
+- `180`: 左
+- `270`: 上
+- 任意の角度を指定可能
+
+#### angleLFO（角度LFO）
+有効にすると、移動中に蛇行するような動きになります。
+- `angleLFORate`: 蛇行の速さ（Hz）
+- `angleLFODepth`: 蛇行の振れ幅（度）
+
+#### easing（イージング）
+移動の加減速を制御します。`src/utils/math/easing.ts`から関数をインポートして使用。
+
+| 関数 | 動き |
+|------|------|
+| `linear` | 等速（デフォルト） |
+| `easeInQuad` | 最初ゆっくり→加速 |
+| `easeOutQuad` | 最初速い→減速 |
+| `easeInOutQuad` | 両端ゆっくり |
+| `easeOutBack` | オーバーシュート付き減速 |
+
+### 使用例
+
+```typescript
+import { linear, easeOutQuad } from "../utils/math/easing";
+
+// 右に100px移動する円
+new CircleSynthObject(
+    100, p.height / 2,
+    p.millis(),
+    120,
+    synthParams,
+    50,
+    {
+        angle: 0,           // 右方向
+        distance: 100,      // 100px移動
+        angleLFO: false,
+        angleLFORate: 0,
+        angleLFODepth: 0,
+        easing: easeOutQuad // 減速しながら到着
+    }
+);
+
+// 蛇行しながら下に移動する多角形
+new PolygonSynthObject(
+    p.width / 2, 100,
+    p.millis(),
+    120,
+    synthParams,
+    polygonParams,
+    {
+        angle: 90,          // 下方向
+        distance: 300,
+        angleLFO: true,     // 蛇行有効
+        angleLFORate: 2,    // 2Hz
+        angleLFODepth: 30,  // ±30度
+        easing: linear
+    }
+);
+```
+
+---
+
 ## CircleSynthObject（円）
 
 シンプルな円。元のSynthObjectと同じ動作。
