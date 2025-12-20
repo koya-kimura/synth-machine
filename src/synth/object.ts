@@ -9,7 +9,7 @@
 export { BaseSynthObject } from "./baseSynthObject";
 
 // 各図形タイプ
-export { CircleSynthObject } from "./circleSynthObject";
+export { CircleSynthObject, type EllipseParams } from "./circleSynthObject";
 export { RectSynthObject, type RectParams } from "./rectSynthObject";
 export { PolygonSynthObject, type PolygonParams } from "./polygonSynthObject";
 

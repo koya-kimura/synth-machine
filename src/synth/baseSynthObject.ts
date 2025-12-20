@@ -2,6 +2,7 @@ import p5 from "p5";
 import type { SynthParams, ADSRPhase, MovementParams, EasingFunction } from "./synthTypes";
 import { beatsToMs } from "./synthTypes";
 import { linear } from "../utils/math/easing";
+import { getSynthColorHSB, type SynthColorKey } from "../utils/color/colorPalette";
 
 /**
  * BaseSynthObject - シンセサイザービジュアルオブジェクトの基底クラス
@@ -329,12 +330,24 @@ export abstract class BaseSynthObject {
         tex.colorMode(tex.HSB);
 
         const alpha = this.currentLevel * 255;
-        tex.fill(
-            this.params.colorParams.hue,
-            this.params.colorParams.saturation,
-            this.params.colorParams.brightness,
-            alpha
-        );
+
+        // パレット色が指定されていれば優先
+        let hue: number;
+        let saturation: number;
+        let brightness: number;
+
+        if (this.params.colorParams.paletteColor) {
+            const hsb = getSynthColorHSB(this.params.colorParams.paletteColor as SynthColorKey);
+            hue = hsb.hue;
+            saturation = hsb.saturation;
+            brightness = hsb.brightness;
+        } else {
+            hue = this.params.colorParams.hue;
+            saturation = this.params.colorParams.saturation;
+            brightness = this.params.colorParams.brightness;
+        }
+
+        tex.fill(hue, saturation, brightness, alpha);
         tex.noStroke();
     }
 

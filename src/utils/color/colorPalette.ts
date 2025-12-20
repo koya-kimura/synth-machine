@@ -40,3 +40,80 @@ export const COLOR_PALETTES: ColorPalette[] = [
 export const getPalette = (index: number): ColorPalette => {
   return COLOR_PALETTES[index % COLOR_PALETTES.length];
 };
+
+// ========================================
+// SynthObject用カラーパレット
+// コントラストの高い虹色8色
+// ========================================
+
+/**
+ * SynthObject用カラーパレット
+ * コントラストの高い虹色8色（HEX形式）
+ */
+export const SYNTH_COLORS = {
+  RED: "#FF1744",       // 鮮やかな赤
+  ORANGE: "#FF9100",    // 鮮やかなオレンジ
+  YELLOW: "#FFEA00",    // 鮮やかな黄
+  GREEN: "#00E676",     // 鮮やかな緑
+  CYAN: "#00E5FF",      // 鮮やかなシアン
+  BLUE: "#2979FF",      // 鮮やかな青
+  PURPLE: "#D500F9",    // 鮮やかな紫
+  PINK: "#FF4081",      // 鮮やかなピンク
+} as const;
+
+/** SYNTH_COLORSのキー型 */
+export type SynthColorKey = keyof typeof SYNTH_COLORS;
+
+/**
+ * HEX色をHSB値に変換
+ * @param hex HEX形式の色（例: "#FF1744"）
+ * @returns { hue: 0-360, saturation: 0-100, brightness: 0-100 }
+ */
+export function hexToHSB(hex: string): { hue: number; saturation: number; brightness: number } {
+  // HEXからRGBに変換
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i.exec(hex);
+  if (!result) {
+    return { hue: 0, saturation: 0, brightness: 100 };
+  }
+
+  const r = parseInt(result[1], 16) / 255;
+  const g = parseInt(result[2], 16) / 255;
+  const b = parseInt(result[3], 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+
+  let h = 0;
+  const s = max === 0 ? 0 : d / max;
+  const v = max;
+
+  if (max !== min) {
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+
+  return {
+    hue: Math.round(h * 360),
+    saturation: Math.round(s * 100),
+    brightness: Math.round(v * 100),
+  };
+}
+
+/**
+ * SYNTH_COLORSのキーからHSB値を取得
+ */
+export function getSynthColorHSB(key: SynthColorKey): { hue: number; saturation: number; brightness: number } {
+  return hexToHSB(SYNTH_COLORS[key]);
+}
+

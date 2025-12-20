@@ -3,11 +3,22 @@ import type { SynthParams, MovementParams } from "./synthTypes";
 import { BaseSynthObject } from "./baseSynthObject";
 
 /**
- * CircleSynthObject - 円形のシンセサイザービジュアルオブジェクト
+ * 円/楕円固有のパラメータ
+ */
+export interface EllipseParams {
+    /** アスペクト比（幅/高さ、1.0=正円、>1=横長、<1=縦長） */
+    aspectRatio?: number;
+}
+
+/**
+ * CircleSynthObject - 円形/楕円形のシンセサイザービジュアルオブジェクト
  * 
- * 基本的な円を描画します。元のSynthObjectと同等の機能を持ちます。
+ * 基本的な円を描画します。aspectRatioを指定すると楕円になります。
  */
 export class CircleSynthObject extends BaseSynthObject {
+    /** アスペクト比（幅/高さ） */
+    private aspectRatio: number;
+
     /**
      * CircleSynthObjectを生成
      * 
@@ -18,6 +29,7 @@ export class CircleSynthObject extends BaseSynthObject {
      * @param params - シンセサイザーパラメータ
      * @param baseSize - 基本サイズ（半径）
      * @param movementParams - 移動パラメータ（オプショナル）
+     * @param ellipseParams - 楕円パラメータ（オプショナル）
      */
     constructor(
         x: number,
@@ -26,19 +38,25 @@ export class CircleSynthObject extends BaseSynthObject {
         bpm: number,
         params: SynthParams,
         baseSize: number = 50,
-        movementParams?: MovementParams
+        movementParams?: MovementParams,
+        ellipseParams?: EllipseParams
     ) {
         super(x, y, startTime, bpm, params, baseSize, movementParams);
+        this.aspectRatio = ellipseParams?.aspectRatio ?? 1.0;
     }
 
     /**
-     * 円を描画
+     * 円/楕円を描画
      */
     display(p: p5, tex: p5.Graphics): void {
-        const radius = this.calculateUniformSize(p);
+        const size = this.calculateUniformSize(p);
+
+        // アスペクト比に基づいて幅と高さを計算
+        const width = size * 2 * this.aspectRatio;
+        const height = size * 2;
 
         this.setupDrawing(tex);
-        tex.circle(this.x, this.y, radius * 2);
+        tex.ellipse(this.x, this.y, width, height);
         this.finishDrawing(tex);
     }
 }

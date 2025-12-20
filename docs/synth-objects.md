@@ -30,11 +30,14 @@ interface SynthParams {
     waveform: Waveform;    // 波形タイプ（'sine' | 'saw' | 'square' | 'noise'）
     lfoRate: number;       // LFOレート（Hz）
     lfoDepth: number;      // LFO深度（ピクセル）
-    colorParams: {
-        hue: number;        // 色相（0〜360）
-        saturation: number; // 彩度（0〜100）
-        brightness: number; // 明度（0〜100）
-    };
+    colorParams: ColorParams;
+}
+
+interface ColorParams {
+    hue: number;           // 色相（0〜360）
+    saturation: number;    // 彩度（0〜100）
+    brightness: number;    // 明度（0〜100）
+    paletteColor?: string; // パレット色（指定するとHSBより優先）
 }
 ```
 
@@ -60,6 +63,40 @@ Level
 サイズに周期的な揺れを加えます：
 - `lfoRate`: 揺れの速さ（Hz、1秒間の振動回数）
 - `lfoDepth`: 揺れの振幅（ピクセル）
+
+### カラーパレット（SYNTH_COLORS）
+
+コントラストの高い虹色8色のパレット。`paletteColor`を指定するとHSB値より優先されます。
+
+| キー | 色 | HEX |
+|------|-----|-----|
+| `RED` | 🔴 赤 | #FF1744 |
+| `ORANGE` | 🟠 オレンジ | #FF9100 |
+| `YELLOW` | 🟡 黄 | #FFEA00 |
+| `GREEN` | 🟢 緑 | #00E676 |
+| `CYAN` | 🔵 シアン | #00E5FF |
+| `BLUE` | 🔵 青 | #2979FF |
+| `PURPLE` | 🟣 紫 | #D500F9 |
+| `PINK` | 🩷 ピンク | #FF4081 |
+
+### 色指定の例
+
+```typescript
+// HSBで直接指定
+colorParams: {
+    hue: 180,
+    saturation: 80,
+    brightness: 100,
+}
+
+// パレット色を使用（HSBより優先）
+colorParams: {
+    hue: 0,           // 無視される
+    saturation: 0,    // 無視される
+    brightness: 0,    // 無視される
+    paletteColor: 'CYAN',  // シアンを使用
+}
+```
 
 ---
 
@@ -148,24 +185,34 @@ new PolygonSynthObject(
 
 ---
 
-## CircleSynthObject（円）
+## CircleSynthObject（円/楕円）
 
-シンプルな円。元のSynthObjectと同じ動作。
+シンプルな円。`aspectRatio`を指定すると楕円になります。
+
+### EllipseParams（オプショナル）
+
+```typescript
+interface EllipseParams {
+    aspectRatio?: number;  // 幅/高さ比（1.0=正円、>1=横長、<1=縦長）
+}
+```
 
 ### コンストラクタ
 
 ```typescript
 new CircleSynthObject(
-    x: number,          // X座標
-    y: number,          // Y座標
-    startTime: number,  // 生成時刻（p.millis()）
-    bpm: number,        // BPM
-    params: SynthParams,// シンセパラメータ
-    baseSize: number    // 基本サイズ（ピクセル、半径）
+    x: number,               // X座標
+    y: number,               // Y座標
+    startTime: number,       // 生成時刻（p.millis()）
+    bpm: number,             // BPM
+    params: SynthParams,     // シンセパラメータ
+    baseSize: number,        // 基本サイズ（ピクセル、半径）
+    movementParams?: MovementParams,  // 移動パラメータ（オプショナル）
+    ellipseParams?: EllipseParams     // 楕円パラメータ（オプショナル）
 )
 ```
 
-### 例
+### 例：正円
 
 ```typescript
 new CircleSynthObject(
@@ -173,18 +220,44 @@ new CircleSynthObject(
     p.height / 2,
     p.millis(),
     120,
-    {
-        attackTime: 0.5,
-        decayTime: 0.2,
-        sustainLevel: 0.8,
-        releaseTime: 1.0,
-        noteDuration: 2.0,
-        waveform: 'sine',
-        lfoRate: 2,
-        lfoDepth: 10,
-        colorParams: { hue: 180, saturation: 80, brightness: 100 },
-    },
+    synthParams,
     50  // 半径50px
+);
+```
+
+### 例：横長の楕円
+
+```typescript
+new CircleSynthObject(
+    p.width / 2,
+    p.height / 2,
+    p.millis(),
+    120,
+    synthParams,
+    50,
+    undefined,  // movementParams不要の場合
+    { aspectRatio: 2.0 }  // 幅が高さの2倍
+);
+```
+
+### 例：移動する縦長の楕円
+
+```typescript
+new CircleSynthObject(
+    p.width / 2,
+    p.height,
+    p.millis(),
+    120,
+    synthParams,
+    50,
+    {   // 上に移動
+        angle: 270,
+        distance: 300,
+        angleLFO: false,
+        angleLFORate: 0,
+        angleLFODepth: 0,
+    },
+    { aspectRatio: 0.5 }  // 縦長（高さが幅の2倍）
 );
 ```
 

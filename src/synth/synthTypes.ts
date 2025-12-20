@@ -15,11 +15,14 @@ export type ADSRPhase =
 
 /**
  * Color parameters for SynthObject
+ * パレット色を指定した場合、HSB値より優先されます
  */
 export interface ColorParams {
     hue: number;        // 0-360
     saturation: number; // 0-100
     brightness: number; // 0-100
+    /** パレット色（指定するとHSB値より優先） */
+    paletteColor?: 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'CYAN' | 'BLUE' | 'PURPLE' | 'PINK';
 }
 
 /**

@@ -1,49 +1,46 @@
 import p5 from "p5";
-import { BaseSynthObject, PolygonSynthObject, type PolygonParams } from "../object";
+import { BaseSynthObject, CircleSynthObject, type EllipseParams } from "../object";
 import type { SynthParams } from "../synthTypes";
 
 /**
- * プリセット3: 頂点が揺れる六角形
- * 不規則な六角形で各頂点が独立してLFOで揺れる
+ * プリセット3: カラーパレットを使った楕円
+ * 横長の楕円がカラーパレットのCYANで描画される
  */
 export const createGridCirclesPreset = (p: p5, bpm: number, startTime: number): BaseSynthObject[] => {
     const objects: BaseSynthObject[] = [];
 
-    // シンセパラメータ
+    // シンセパラメータ（カラーパレット使用）
     const synthParams: SynthParams = {
-        attackTime: 0.3,
-        decayTime: 0.1,
-        sustainLevel: 0.9,
-        releaseTime: 0.8,
-        noteDuration: 3.0,
+        attackTime: 0.5,
+        decayTime: 0.2,
+        sustainLevel: 0.8,
+        releaseTime: 1.0,
+        noteDuration: 2.5,
         waveform: 'sine',
-        lfoRate: 1,
-        lfoDepth: 10,
+        lfoRate: 1.5,
+        lfoDepth: 15,
         colorParams: {
-            hue: 120,       // 緑
-            saturation: 70,
-            brightness: 90,
+            hue: 0,           // パレット使用時は無視
+            saturation: 0,
+            brightness: 0,
+            paletteColor: 'PURPLE',  // 紫色
         },
     };
 
-    // 多角形パラメータ（六角形、少し不規則、頂点LFO有効）
-    const polygonParams: PolygonParams = {
-        sides: 6,
-        baseRadius: 80,
-        irregularity: 0.15,      // 少し不規則
-        spikiness: 0,            // 窪みなし
-        vertexLFO: true,         // 頂点ごとのLFO有効
-        vertexLFORate: 0.8,
-        vertexLFODepth: 15,
+    // 楕円パラメータ（横長）
+    const ellipseParams: EllipseParams = {
+        aspectRatio: 2.5,  // 幅が高さの2.5倍
     };
 
-    objects.push(new PolygonSynthObject(
+    objects.push(new CircleSynthObject(
         p.width / 2,
         p.height / 2,
         startTime,
         bpm,
         synthParams,
-        polygonParams
+        60,              // 基本サイズ
+        undefined,       // movementParams（使用しない）
+        ellipseParams
     ));
 
     return objects;
