@@ -16,21 +16,22 @@ SynthObjectは3つの図形タイプをサポートしています：
 
 ---
 
-## 共通の引数順
+## 基本的な使い方
 
-**全ての図形で統一された引数順：**
+全ての図形はオブジェクト形式で設定を渡します：
 
 ```typescript
-new [SynthObject](
-    startTime,       // 生成時刻（p.millis()）
-    bpm,             // BPM
-    x,               // X座標
-    y,               // Y座標
-    baseSize,        // 基本サイズ（デフォルト: 50）
-    params?,         // SynthParams（オプショナル）
-    shapeParams?,    // 図形固有パラメータ（オプショナル）
-    movementParams?  // MovementParams（オプショナル）
-)
+new CircleSynthObject({
+    startTime,          // 生成時刻（p.millis()）
+    bpm,                // BPM
+    x: p.width / 2,     // X座標
+    y: p.height / 2,    // Y座標
+    size: 100,          // サイズ（デフォルト: 50）
+    angle: 0,           // 回転角度（度、デフォルト: 0）
+    params: { ... },    // シンセパラメータ（オプショナル）
+    ellipse: { ... },   // 図形固有パラメータ（オプショナル）
+    movement: { ... },  // 移動パラメータ（オプショナル）
+})
 ```
 
 ---
@@ -49,13 +50,6 @@ interface SynthParams {
     lfoRate?: number;        // LFOレート（拍あたり周期数、デフォルト: 0）
     lfoDepth?: number;       // LFO深度（baseSize比、デフォルト: 0）
     colorParams?: ColorParams;
-}
-
-interface ColorParams {
-    hue?: number;           // 色相（0-360、デフォルト: 0）
-    saturation?: number;    // 彩度（0-100、デフォルト: 0）
-    brightness?: number;    // 明度（0-100、デフォルト: 100）
-    paletteColor?: string;  // パレット色（HSBより優先）
 }
 ```
 
@@ -98,31 +92,18 @@ interface ColorParams {
 
 ---
 
-## MovementParams（オプショナル）
-
-```typescript
-interface MovementParams {
-    angle: number;           // 移動角度（度、0=右、90=下、180=左、270=上）
-    distance: number;        // 移動距離（ピクセル）
-    angleLFO?: boolean;      // 角度LFO（デフォルト: false）
-    angleLFORate?: number;   // 角度LFOレート（Hz）
-    angleLFODepth?: number;  // 角度LFO深度（度）
-    easing?: EasingFunction; // イージング関数
-}
-```
-
----
-
 ## CircleSynthObject（円/楕円）
 
 ```typescript
-new CircleSynthObject(
-    startTime, bpm, x, y,
-    baseSize,        // サイズ（半径）
-    params?,         // SynthParams
-    movementParams?, // MovementParams
-    ellipseParams?   // { aspectRatio?: number }
-)
+new CircleSynthObject({
+    startTime, bpm,
+    x: p.width / 2,
+    y: p.height / 2,
+    size: 100,
+    angle: 0,
+    params: { colorParams: { paletteColor: 'RED' } },
+    ellipse: { aspectRatio: 2.0 },  // 横長楕円
+})
 ```
 
 ### EllipseParams
@@ -131,42 +112,23 @@ new CircleSynthObject(
 |------------|------|-----------|
 | `aspectRatio` | 幅/高さ比（1.0=正円、>1=横長、<1=縦長） | 1.0 |
 
-### 例：シンプルな円
-
-```typescript
-new CircleSynthObject(
-    startTime, bpm,
-    p.width / 2, p.height / 2,
-    100,
-    { colorParams: { paletteColor: 'RED' } }
-);
-```
-
-### 例：横長の楕円
-
-```typescript
-new CircleSynthObject(
-    startTime, bpm,
-    p.width / 2, p.height / 2,
-    50,
-    { colorParams: { paletteColor: 'CYAN' } },
-    undefined,
-    { aspectRatio: 2.0 }
-);
-```
-
 ---
 
 ## RectSynthObject（長方形）
 
 ```typescript
-new RectSynthObject(
-    startTime, bpm, x, y,
-    baseSize,        // 基本サイズ
-    params?,         // SynthParams
-    movementParams?, // MovementParams
-    rectParams?      // RectParams
-)
+new RectSynthObject({
+    startTime, bpm,
+    x: p.width / 2,
+    y: p.height / 2,
+    size: 100,
+    angle: 45,  // 45度回転
+    params: { colorParams: { paletteColor: 'ORANGE' } },
+    rect: {
+        aspectRatio: 4,
+        stretchMode: 'horizontal',
+    },
+})
 ```
 
 ### RectParams
@@ -180,36 +142,23 @@ new RectSynthObject(
 | `lfoHeightRate` | 高さLFOレート（Hz） | 0 |
 | `lfoHeightDepth` | 高さLFO深度（px） | 0 |
 
-### 例：水平に伸縮するバー
-
-```typescript
-new RectSynthObject(
-    startTime, bpm,
-    p.width / 2, p.height / 2,
-    100,
-    { colorParams: { paletteColor: 'ORANGE' } },
-    undefined,
-    {
-        aspectRatio: 4,
-        stretchMode: 'horizontal',
-        lfoWidthRate: 2,
-        lfoWidthDepth: 100,
-    }
-);
-```
-
 ---
 
 ## PolygonSynthObject（多角形）
 
 ```typescript
-new PolygonSynthObject(
-    startTime, bpm, x, y,
-    baseSize,        // 基本サイズ（半径）
-    params?,         // SynthParams
-    movementParams?, // MovementParams
-    polygonParams?   // PolygonParams
-)
+new PolygonSynthObject({
+    startTime, bpm,
+    x: p.width / 2,
+    y: p.height / 2,
+    size: 80,
+    angle: 30,  // 30度回転
+    params: { colorParams: { paletteColor: 'CYAN' } },
+    polygon: {
+        sides: 6,
+        spikiness: 0.5,  // 星形
+    },
+})
 ```
 
 ### PolygonParams
@@ -223,35 +172,33 @@ new PolygonSynthObject(
 | `vertexLFORate` | 頂点LFOレート（Hz） | 0 |
 | `vertexLFODepth` | 頂点LFO深度（px） | 0 |
 
-### 例：六角形
+---
+
+## MovementParams（移動）
 
 ```typescript
-new PolygonSynthObject(
-    startTime, bpm,
-    p.width / 2, p.height / 2,
-    80,
-    { colorParams: { paletteColor: 'CYAN' } },
-    undefined,
-    { sides: 6 }
-);
+movement: {
+    angle: 270,           // 上方向
+    distance: 300,        // 300px移動
+    angleLFO: true,       // 蛇行
+    angleLFORate: 1,
+    angleLFODepth: 20,
+    easing: easeOutQuad,  // イージング
+}
 ```
 
-### 例：星形（10頂点、窪みあり）
-
-```typescript
-new PolygonSynthObject(
-    startTime, bpm,
-    p.width / 2, p.height / 2,
-    80,
-    { colorParams: { paletteColor: 'YELLOW' } },
-    undefined,
-    { sides: 10, spikiness: 0.5 }
-);
-```
+| パラメータ | 説明 | デフォルト |
+|------------|------|-----------|
+| `angle` | 移動角度（度、0=右、90=下、180=左、270=上） | - |
+| `distance` | 移動距離（ピクセル） | - |
+| `angleLFO` | 角度LFO有効化 | false |
+| `angleLFORate` | 角度LFOレート（Hz） | 0 |
+| `angleLFODepth` | 角度LFO深度（度） | 0 |
+| `easing` | イージング関数 | linear |
 
 ---
 
-## プリセットでの使用例
+## プリセット例
 
 ```typescript
 import p5 from "p5";
@@ -259,16 +206,19 @@ import { BaseSynthObject, CircleSynthObject } from "../object";
 
 export const myPreset = (p: p5, bpm: number, startTime: number): BaseSynthObject[] => {
     return [
-        new CircleSynthObject(
-            startTime, bpm,
-            p.width / 2, p.height / 2,
-            Math.min(p.width, p.height) * 0.4,
-            {
+        new CircleSynthObject({
+            startTime,
+            bpm,
+            x: p.width / 2,
+            y: p.height / 2,
+            size: Math.min(p.width, p.height) * 0.4,
+            angle: 0,
+            params: {
                 attackTime: 0.02,
                 decayTime: 0.5,
                 colorParams: { paletteColor: 'RED' }
             }
-        )
+        })
     ];
 };
 ```
@@ -283,9 +233,10 @@ import {
     RectSynthObject, 
     PolygonSynthObject,
     BaseSynthObject,
-    type EllipseParams,
-    type RectParams,
-    type PolygonParams,
+    type CircleConfig,
+    type RectConfig,
+    type PolygonConfig,
+    type SynthObjectConfig,
     type MovementParams,
 } from "../synth/object";
 ```

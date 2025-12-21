@@ -1,5 +1,5 @@
 import p5 from "p5";
-import type { SynthParams, MovementParams } from "./synthTypes";
+import type { SynthObjectConfig } from "./synthTypes";
 import { BaseSynthObject } from "./baseSynthObject";
 
 /**
@@ -18,6 +18,14 @@ export interface PolygonParams {
     vertexLFORate?: number;
     /** 頂点LFOの深度（ピクセル、デフォルト: 0） */
     vertexLFODepth?: number;
+}
+
+/**
+ * PolygonSynthObjectの設定
+ */
+export interface PolygonConfig extends SynthObjectConfig {
+    /** 多角形パラメータ（オプショナル） */
+    polygon?: PolygonParams;
 }
 
 /**
@@ -48,35 +56,19 @@ export class PolygonSynthObject extends BaseSynthObject {
     /**
      * PolygonSynthObjectを生成
      * 
-     * @param startTime - 生成時刻
-     * @param bpm - BPM
-     * @param x - X座標
-     * @param y - Y座標
-     * @param baseSize - 基本サイズ（半径、デフォルト: 50）
-     * @param params - シンセサイザーパラメータ（オプショナル）
-     * @param polygonParams - 多角形固有のパラメータ（オプショナル）
-     * @param movementParams - 移動パラメータ（オプショナル）
+     * @param config - オブジェクト設定
      */
-    constructor(
-        startTime: number,
-        bpm: number,
-        x: number,
-        y: number,
-        baseSize: number = 50,
-        params: SynthParams = {},
-        polygonParams: PolygonParams = {},
-        movementParams?: MovementParams
-    ) {
-        super(startTime, bpm, x, y, baseSize, params, movementParams);
+    constructor(config: PolygonConfig) {
+        super(config);
 
         // デフォルト値を適用
         this.polygonParams = {
-            sides: polygonParams.sides ?? 6,
-            irregularity: polygonParams.irregularity ?? 0,
-            spikiness: polygonParams.spikiness ?? 0,
-            vertexLFO: polygonParams.vertexLFO ?? false,
-            vertexLFORate: polygonParams.vertexLFORate ?? 0,
-            vertexLFODepth: polygonParams.vertexLFODepth ?? 0,
+            sides: config.polygon?.sides ?? 6,
+            irregularity: config.polygon?.irregularity ?? 0,
+            spikiness: config.polygon?.spikiness ?? 0,
+            vertexLFO: config.polygon?.vertexLFO ?? false,
+            vertexLFORate: config.polygon?.vertexLFORate ?? 0,
+            vertexLFODepth: config.polygon?.vertexLFODepth ?? 0,
         };
 
         // 頂点情報を生成
@@ -88,6 +80,10 @@ export class PolygonSynthObject extends BaseSynthObject {
      */
     display(p: p5, tex: p5.Graphics): void {
         this.setupDrawing(tex);
+
+        // 回転を適用（ラジアン）
+        tex.translate(this.x, this.y);
+        tex.rotate(this.rotationAngle);
 
         tex.beginShape();
 
@@ -151,7 +147,7 @@ export class PolygonSynthObject extends BaseSynthObject {
     }
 
     /**
-     * 頂点の現在位置を計算
+     * 頂点の現在位置を計算（ローカル座標系）
      */
     private calculateVertexPosition(p: p5, vertex: Vertex): { x: number; y: number } {
         // ADSRレベルを適用した半径
@@ -166,9 +162,9 @@ export class PolygonSynthObject extends BaseSynthObject {
             radius += vertexLFO;
         }
 
-        // 極座標から直交座標に変換
-        const x = this.x + Math.cos(vertex.baseAngle) * radius;
-        const y = this.y + Math.sin(vertex.baseAngle) * radius;
+        // 極座標から直交座標に変換（ローカル座標系、中心は0,0）
+        const x = Math.cos(vertex.baseAngle) * radius;
+        const y = Math.sin(vertex.baseAngle) * radius;
 
         return { x, y };
     }

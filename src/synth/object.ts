@@ -8,14 +8,13 @@
 // 基底クラス
 export { BaseSynthObject } from "./baseSynthObject";
 
-// 各図形タイプ
-export { CircleSynthObject, type EllipseParams } from "./circleSynthObject";
-export { RectSynthObject, type RectParams } from "./rectSynthObject";
-export { PolygonSynthObject, type PolygonParams } from "./polygonSynthObject";
+// 各図形タイプとConfig
+export { CircleSynthObject, type EllipseParams, type CircleConfig } from "./circleSynthObject";
+export { RectSynthObject, type RectParams, type RectConfig } from "./rectSynthObject";
+export { PolygonSynthObject, type PolygonParams, type PolygonConfig } from "./polygonSynthObject";
 
 // 型のエクスポート
-export type { MovementParams, EasingFunction } from "./synthTypes";
+export type { SynthObjectConfig, MovementParams, EasingFunction, SynthParams } from "./synthTypes";
 
 // 後方互換性のため、CircleSynthObjectをSynthObjectとしてエクスポート
 export { CircleSynthObject as SynthObject } from "./circleSynthObject";
-

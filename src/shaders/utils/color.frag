@@ -42,3 +42,39 @@ vec3 rgb2hsv(vec3 c) {
     float e = 1.0e-10;
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
+
+// RGBシフト
+vec3 rgbShift(sampler2D tex, vec2 uv, vec2 shift){
+    vec3 col = texture2D(tex, uv).rgb;
+    vec3 shiftedCol1 = texture2D(tex, uv + shift).rgb;
+    vec3 shiftedCol2 = texture2D(tex, uv - shift).rgb;
+
+    return vec3(col.r, max(shiftedCol1.g, shiftedCol2.g), col.b);
+}
+
+// Sobelエッジ検出
+float edge(sampler2D tex, vec2 uv, vec2 resolution) {
+    vec2 texel = 1.0 / resolution;
+    
+    // 周囲8ピクセルのグレースケール値を取得
+    float tl = gray(texture2D(tex, uv + vec2(-texel.x, -texel.y)).rgb);
+    float t  = gray(texture2D(tex, uv + vec2(0.0, -texel.y)).rgb);
+    float tr = gray(texture2D(tex, uv + vec2(texel.x, -texel.y)).rgb);
+    float l  = gray(texture2D(tex, uv + vec2(-texel.x, 0.0)).rgb);
+    float r  = gray(texture2D(tex, uv + vec2(texel.x, 0.0)).rgb);
+    float bl = gray(texture2D(tex, uv + vec2(-texel.x, texel.y)).rgb);
+    float b  = gray(texture2D(tex, uv + vec2(0.0, texel.y)).rgb);
+    float br = gray(texture2D(tex, uv + vec2(texel.x, texel.y)).rgb);
+    
+    // Sobelカーネル
+    float gx = -tl - 2.0*l - bl + tr + 2.0*r + br;
+    float gy = -tl - 2.0*t - tr + bl + 2.0*b + br;
+    
+    return sqrt(gx*gx + gy*gy);
+}
+
+// Sobelエッジ検出（カラー出力）
+vec3 edgeColor(sampler2D tex, vec2 uv, vec2 resolution) {
+    float e = edge(tex, uv, resolution);
+    return vec3(e);
+}

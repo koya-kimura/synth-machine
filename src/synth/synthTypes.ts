@@ -46,8 +46,6 @@ export interface SynthParams {
     sustainLevel?: number;
     /** Release time in beats（デフォルト: 0.1） */
     releaseTime?: number;
-    /** Note duration in beats（デフォルト: 1.0） */
-    noteDuration?: number;
     /** Waveform type（デフォルト: 'sine'） */
     waveform?: Waveform;
     /** LFO waveform type（デフォルト: 'sine'） */
@@ -68,7 +66,6 @@ export interface ResolvedSynthParams {
     decayTime: number;
     sustainLevel: number;
     releaseTime: number;
-    noteDuration: number;
     waveform: Waveform;
     lfoType: LfoType;
     lfoRate: number;
@@ -90,7 +87,6 @@ export function resolveSynthParams(params: SynthParams = {}): ResolvedSynthParam
         decayTime: params.decayTime ?? 0,
         sustainLevel: params.sustainLevel ?? 1.0,
         releaseTime: params.releaseTime ?? 0.1,
-        noteDuration: params.noteDuration ?? 1.0,
         waveform: params.waveform ?? 'sine',
         lfoType: params.lfoType ?? 'sine',
         lfoRate: params.lfoRate ?? 0,
@@ -115,7 +111,7 @@ export type EasingFunction = (x: number) => number;
  * オブジェクトの移動を制御するパラメータ
  */
 export interface MovementParams {
-    /** 移動角度（度、0=右、90=下、180=左、270=上） */
+    /** 移動角度（ラジアン、0=右、π/2=下、π=左、3π/2=上） */
     angle: number;
     /** 移動距離（ピクセル） */
     distance: number;
@@ -123,7 +119,7 @@ export interface MovementParams {
     angleLFO?: boolean;
     /** 角度LFOレート（Hz、デフォルト: 0） */
     angleLFORate?: number;
-    /** 角度LFO深度（度、デフォルト: 0） */
+    /** 角度LFO深度（ラジアン、デフォルト: 0） */
     angleLFODepth?: number;
     /** イージング関数（デフォルト: linear） */
     easing?: EasingFunction;
@@ -138,3 +134,27 @@ export interface MovementParams {
 export function beatsToMs(beats: number, bpm: number): number {
     return (beats * 60000) / bpm;
 }
+
+/**
+ * SynthObjectの共通設定
+ * オブジェクト形式でコンストラクタに渡す
+ */
+export interface SynthObjectConfig {
+    /** 生成時刻（p.millis()） */
+    startTime: number;
+    /** BPM */
+    bpm: number;
+    /** X座標 */
+    x: number;
+    /** Y座標 */
+    y: number;
+    /** 基本サイズ（デフォルト: 50） */
+    size?: number;
+    /** 回転角度（ラジアン、デフォルト: 0） */
+    angle?: number;
+    /** シンセパラメータ（オプショナル） */
+    params?: SynthParams;
+    /** 移動パラメータ（オプショナル） */
+    movement?: MovementParams;
+}
+

@@ -39,3 +39,7 @@ float posterize(float value, float levels) {
 float threshold(float value, float thresh) {
     return value > thresh ? 1.0 : 0.0;
 }
+
+float map(float value, float a, float b, float c, float d) {
+    return (value - a) * (d - c) / (b - a) + c;
+}

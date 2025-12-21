@@ -43,7 +43,7 @@ export class EffectManager {
    */
   apply(
     p: p5,
-    _midiManager: APCMiniMK2Manager,
+    midiManager: APCMiniMK2Manager,
     beat: number,
     sourceTexture: p5.Graphics,
     uiTexture: p5.Graphics,
@@ -63,6 +63,7 @@ export class EffectManager {
       this.shader.setUniform("u_resolution", [p.width, p.height]);
       this.shader.setUniform("u_time", p.millis() / 1000.0);
       this.shader.setUniform("u_beat", beat);
+      this.shader.setUniform("u_faderValues", midiManager.faderValues);
       // フルスクリーン矩形を描画
       p.rect(0, 0, p.width, p.height);
       p.resetShader(); // シェーダーをリセット

@@ -1,5 +1,5 @@
 import p5 from "p5";
-import type { SynthParams, ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams } from "./synthTypes";
+import type { SynthParams, ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams, SynthObjectConfig } from "./synthTypes";
 import { beatsToMs, resolveSynthParams } from "./synthTypes";
 import { linear } from "../utils/math/easing";
 import { getSynthColorHSB, type SynthColorKey } from "../utils/color/colorPalette";
@@ -47,6 +47,9 @@ export abstract class BaseSynthObject {
     /** 基本サイズ（ピクセル） */
     protected baseSize: number;
 
+    /** 回転角度（度） */
+    protected rotationAngle: number;
+
     /** ランダムシード（インスタンス固有） */
     protected randomSeed: number;
 
@@ -59,9 +62,6 @@ export abstract class BaseSynthObject {
 
     /** リリース時間（ミリ秒） */
     protected releaseMs: number;
-
-    /** ノート継続時間（ミリ秒） */
-    protected noteDurationMs: number;
 
     // 移動パラメータ
     /** 移動パラメータ（オプショナル） */
@@ -80,51 +80,37 @@ export abstract class BaseSynthObject {
     /**
      * BaseSynthObjectを生成
      * 
-     * @param startTime - 生成時刻（p.millis()の値）
-     * @param bpm - BPM
-     * @param x - X座標
-     * @param y - Y座標
-     * @param baseSize - 基本サイズ（デフォルト: 50）
-     * @param params - シンセサイザーパラメータ（オプショナル、デフォルト値あり）
-     * @param movementParams - 移動パラメータ（オプショナル）
+     * @param config - オブジェクト設定
      */
-    constructor(
-        startTime: number,
-        bpm: number,
-        x: number,
-        y: number,
-        baseSize: number = 50,
-        params: SynthParams = {},
-        movementParams?: MovementParams
-    ) {
+    constructor(config: SynthObjectConfig) {
         // パラメータにデフォルト値を適用
-        this.params = resolveSynthParams(params);
+        this.params = resolveSynthParams(config.params);
 
-        this.x = x;
-        this.y = y;
-        this.startX = x;
-        this.startY = y;
-        this.startTime = startTime;
-        this.bpm = bpm;
-        this.baseSize = baseSize;
+        this.x = config.x;
+        this.y = config.y;
+        this.startX = config.x;
+        this.startY = config.y;
+        this.startTime = config.startTime;
+        this.bpm = config.bpm;
+        this.baseSize = config.size ?? 50;
+        this.rotationAngle = config.angle ?? 0;
         this.currentPhase = 'ATTACK';
         this.currentLevel = 0;
-        this.movementParams = movementParams;
+        this.movementParams = config.movement;
 
         // インスタンス固有のランダムシードを生成
         this.randomSeed = Math.random() * 10000;
 
         // ビート単位の時間をミリ秒に変換
-        this.attackMs = beatsToMs(this.params.attackTime, bpm);
-        this.decayMs = beatsToMs(this.params.decayTime, bpm);
-        this.releaseMs = beatsToMs(this.params.releaseTime, bpm);
-        this.noteDurationMs = beatsToMs(this.params.noteDuration, bpm);
+        this.attackMs = beatsToMs(this.params.attackTime, config.bpm);
+        this.decayMs = beatsToMs(this.params.decayTime, config.bpm);
+        this.releaseMs = beatsToMs(this.params.releaseTime, config.bpm);
 
-        // 全生存時間を計算（Attack開始〜Release終了）
-        this.totalLifetimeMs = this.noteDurationMs + this.releaseMs;
+        // 全生存時間を計算（Attack + Decay + Release）
+        this.totalLifetimeMs = this.attackMs + this.decayMs + this.releaseMs;
 
         // イージング関数を設定（デフォルト: linear）
-        this.easingFunction = movementParams?.easing ?? linear;
+        this.easingFunction = config.movement?.easing ?? linear;
     }
 
     // ========================================
@@ -215,9 +201,11 @@ export abstract class BaseSynthObject {
 
     /**
      * Sustainフェーズの処理
+     * Sustainは attack + decay の後に来る
      */
     protected processSustainPhase(elapsed: number): void {
-        if (elapsed < this.noteDurationMs) {
+        const sustainStart = this.attackMs + this.decayMs;
+        if (elapsed < sustainStart) {
             this.currentLevel = this.params.sustainLevel;
         } else {
             this.currentPhase = 'RELEASE';
@@ -228,7 +216,7 @@ export abstract class BaseSynthObject {
      * Releaseフェーズの処理
      */
     protected processReleasePhase(elapsed: number): void {
-        const releaseStart = this.noteDurationMs;
+        const releaseStart = this.attackMs + this.decayMs;
         const releaseElapsed = elapsed - releaseStart;
         if (releaseElapsed < this.releaseMs) {
             const releaseProgress = releaseElapsed / this.releaseMs;
@@ -272,12 +260,9 @@ export abstract class BaseSynthObject {
             angle += angleLFOValue;
         }
 
-        // 角度をラジアンに変換
-        const angleRad = (angle * Math.PI) / 180;
-
-        // 新しい位置を計算
-        this.x = this.startX + Math.cos(angleRad) * currentDistance;
-        this.y = this.startY + Math.sin(angleRad) * currentDistance;
+        // 新しい位置を計算（angleはラジアン）
+        this.x = this.startX + Math.cos(angle) * currentDistance;
+        this.y = this.startY + Math.sin(angle) * currentDistance;
     }
 
     // ========================================

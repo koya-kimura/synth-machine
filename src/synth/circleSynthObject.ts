@@ -1,5 +1,5 @@
 import p5 from "p5";
-import type { SynthParams, MovementParams } from "./synthTypes";
+import type { SynthObjectConfig } from "./synthTypes";
 import { BaseSynthObject } from "./baseSynthObject";
 
 /**
@@ -8,6 +8,14 @@ import { BaseSynthObject } from "./baseSynthObject";
 export interface EllipseParams {
     /** アスペクト比（幅/高さ、1.0=正円、>1=横長、<1=縦長） */
     aspectRatio?: number;
+}
+
+/**
+ * CircleSynthObjectの設定
+ */
+export interface CircleConfig extends SynthObjectConfig {
+    /** 楕円パラメータ（オプショナル） */
+    ellipse?: EllipseParams;
 }
 
 /**
@@ -22,27 +30,11 @@ export class CircleSynthObject extends BaseSynthObject {
     /**
      * CircleSynthObjectを生成
      * 
-     * @param startTime - 生成時刻
-     * @param bpm - BPM
-     * @param x - X座標
-     * @param y - Y座標
-     * @param baseSize - 基本サイズ（半径、デフォルト: 50）
-     * @param params - シンセサイザーパラメータ（オプショナル）
-     * @param movementParams - 移動パラメータ（オプショナル）
-     * @param ellipseParams - 楕円パラメータ（オプショナル）
+     * @param config - オブジェクト設定
      */
-    constructor(
-        startTime: number,
-        bpm: number,
-        x: number,
-        y: number,
-        baseSize: number = 50,
-        params: SynthParams = {},
-        movementParams?: MovementParams,
-        ellipseParams?: EllipseParams
-    ) {
-        super(startTime, bpm, x, y, baseSize, params, movementParams);
-        this.aspectRatio = ellipseParams?.aspectRatio ?? 1.0;
+    constructor(config: CircleConfig) {
+        super(config);
+        this.aspectRatio = config.ellipse?.aspectRatio ?? 1.0;
     }
 
     /**
@@ -56,7 +48,12 @@ export class CircleSynthObject extends BaseSynthObject {
         const height = size * 2;
 
         this.setupDrawing(tex);
-        tex.ellipse(this.x, this.y, width, height);
+
+        // 回転を適用（ラジアン）
+        tex.translate(this.x, this.y);
+        tex.rotate(this.rotationAngle);
+        tex.ellipse(0, 0, width, height);
+
         this.finishDrawing(tex);
     }
 }

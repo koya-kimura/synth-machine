@@ -8,6 +8,7 @@ import { PRESETS } from "../synth/presets";
 import { Looper } from "../synth/looper";
 import { PatternPlayer } from "../synth/patterns/patternPlayer";
 import { PRESET_PATTERNS } from "../synth/patterns/presetPatterns";
+import { map } from "../utils/math/mathUtils";
 
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
@@ -237,7 +238,7 @@ export class VisualComposer {
    */
   draw(
     p: p5,
-    _midiManager: APCMiniMK2Manager,
+    midiManager: APCMiniMK2Manager,
     _beat: number,
     _audioManager?: AudioMicManager,
     _captureManager?: CaptureManager,
@@ -248,7 +249,14 @@ export class VisualComposer {
 
     // 背景をクリア
     tex.push();
-    tex.background(0);
+
+    const alpha = map(midiManager.faderValues[0], 0, 1, 255, 0);
+    tex.blendMode(p.BLEND);
+    tex.background(0, alpha);
+
+    if (midiManager.faderValues[7] == 1.0) {
+      tex.blendMode(p.ADD);
+    }
 
     // 全SynthObjectを描画
     this.synthObjects.forEach(obj => obj.display(p, tex));
