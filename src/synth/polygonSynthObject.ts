@@ -79,7 +79,7 @@ export class PolygonSynthObject extends BaseSynthObject {
      * 多角形を描画
      */
     display(p: p5, tex: p5.Graphics): void {
-        this.setupDrawing(tex);
+        this.setupDrawing(p, tex);
 
         // 回転を適用（ラジアン）
         tex.translate(this.x, this.y);
@@ -93,7 +93,7 @@ export class PolygonSynthObject extends BaseSynthObject {
             tex.vertex(x, y);
         }
 
-        tex.endShape(tex.CLOSE);
+        tex.endShape(p.CLOSE);
         this.finishDrawing(tex);
     }
 

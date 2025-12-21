@@ -47,7 +47,7 @@ export class CircleSynthObject extends BaseSynthObject {
         const width = size * 2 * this.aspectRatio;
         const height = size * 2;
 
-        this.setupDrawing(tex);
+        this.setupDrawing(p, tex);
 
         // 回転を適用（ラジアン）
         tex.translate(this.x, this.y);

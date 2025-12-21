@@ -55,7 +55,7 @@ export class RectSynthObject extends BaseSynthObject {
     display(p: p5, tex: p5.Graphics): void {
         const { width, height } = this.calculateDimensions(p);
 
-        this.setupDrawing(tex);
+        this.setupDrawing(p, tex);
 
         // 回転を適用（ラジアン）
         tex.translate(this.x, this.y);

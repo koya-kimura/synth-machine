@@ -189,12 +189,28 @@ movement: {
 
 | パラメータ | 説明 | デフォルト |
 |------------|------|-----------|
-| `angle` | 移動角度（度、0=右、90=下、180=左、270=上） | - |
+| `angle` | 移動角度（ラジアン、0=右、π/2=下、π=左、3π/2=上） | - |
 | `distance` | 移動距離（ピクセル） | - |
 | `angleLFO` | 角度LFO有効化 | false |
 | `angleLFORate` | 角度LFOレート（Hz） | 0 |
-| `angleLFODepth` | 角度LFO深度（度） | 0 |
+| `angleLFODepth` | 角度LFO深度（ラジアン） | 0 |
 | `easing` | イージング関数 | linear |
+
+---
+
+## StyleParams（描画スタイル）
+
+```typescript
+style: {
+    mode: 'stroke',     // 'fill' or 'stroke'
+    strokeWeight: 3,    // ストロークの太さ
+}
+```
+
+| パラメータ | 説明 | デフォルト |
+|------------|------|-----------|
+| `mode` | 描画モード（'fill'=塗りつぶし、'stroke'=輪郭線） | 'fill' |
+| `strokeWeight` | ストロークの太さ（px、modeが'stroke'の場合） | 1 |
 
 ---
 

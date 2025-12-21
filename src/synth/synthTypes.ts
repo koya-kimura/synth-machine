@@ -136,6 +136,17 @@ export function beatsToMs(beats: number, bpm: number): number {
 }
 
 /**
+ * スタイルパラメータ
+ * 描画スタイル（fill/stroke）を制御
+ */
+export interface StyleParams {
+    /** 描画モード（デフォルト: 'fill'） */
+    mode?: 'fill' | 'stroke';
+    /** ストロークの太さ（modeが'stroke'の場合、デフォルト: 1） */
+    strokeWeight?: number;
+}
+
+/**
  * SynthObjectの共通設定
  * オブジェクト形式でコンストラクタに渡す
  */
@@ -156,5 +167,8 @@ export interface SynthObjectConfig {
     params?: SynthParams;
     /** 移動パラメータ（オプショナル） */
     movement?: MovementParams;
+    /** スタイルパラメータ（オプショナル） */
+    style?: StyleParams;
 }
+
 

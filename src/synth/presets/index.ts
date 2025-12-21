@@ -12,6 +12,13 @@ import { snare03 } from "./snare03";
 import { hihat01 } from "./hihat01";
 import { hihat02 } from "./hihat02";
 import { hihat03 } from "./hihat03";
+import { percussion01 } from "./percussion01";
+import { percussion02 } from "./percussion02";
+import { bass01 } from "./bass01";
+import { bass02 } from "./bass02";
+import { lead01 } from "./lead01";
+import { lead02 } from "./lead02";
+import { pad01 } from "./pad01";
 
 /**
  * プリセット配列
@@ -27,4 +34,11 @@ export const PRESETS: Array<(p: p5, bpm: number, startTime: number) => BaseSynth
     hihat01,
     hihat02,
     hihat03,
+    percussion01,
+    percussion02,
+    bass01,
+    bass02,
+    lead01,
+    lead02,
+    pad01,
 ];

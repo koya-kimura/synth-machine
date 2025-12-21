@@ -1,5 +1,5 @@
 import p5 from "p5";
-import type { SynthParams, ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams, SynthObjectConfig } from "./synthTypes";
+import type { SynthParams, ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams, SynthObjectConfig, StyleParams } from "./synthTypes";
 import { beatsToMs, resolveSynthParams } from "./synthTypes";
 import { linear } from "../utils/math/easing";
 import { getSynthColorHSB, type SynthColorKey } from "../utils/color/colorPalette";
@@ -73,6 +73,10 @@ export abstract class BaseSynthObject {
     /** イージング関数 */
     protected easingFunction: EasingFunction;
 
+    /** スタイルパラメータ */
+    protected styleMode: 'fill' | 'stroke';
+    protected strokeWeight: number;
+
     // ========================================
     // コンストラクタ
     // ========================================
@@ -111,6 +115,10 @@ export abstract class BaseSynthObject {
 
         // イージング関数を設定（デフォルト: linear）
         this.easingFunction = config.movement?.easing ?? linear;
+
+        // スタイルパラメータを設定
+        this.styleMode = config.style?.mode ?? 'fill';
+        this.strokeWeight = config.style?.strokeWeight ?? 1;
     }
 
     // ========================================
@@ -367,11 +375,12 @@ export abstract class BaseSynthObject {
     /**
      * 描画の準備（HSBモード設定、透明度計算）
      * 
+     * @param p - p5インスタンス
      * @param tex - 描画先のGraphicsオブジェクト
      */
-    protected setupDrawing(tex: p5.Graphics): void {
+    protected setupDrawing(p: p5, tex: p5.Graphics): void {
         tex.push();
-        tex.colorMode(tex.HSB);
+        tex.colorMode(p.HSB);
 
         const alpha = this.currentLevel * 255;
 
@@ -391,8 +400,17 @@ export abstract class BaseSynthObject {
             brightness = this.params.colorParams.brightness;
         }
 
-        tex.fill(hue, saturation, brightness, alpha);
-        tex.noStroke();
+        // スタイルに応じてfillまたはstrokeを設定
+        if (this.styleMode === 'stroke') {
+            tex.noFill();
+            tex.stroke(hue, saturation, brightness, alpha);
+            tex.strokeWeight(this.strokeWeight);
+            tex.strokeCap(p.SQUARE);
+            tex.strokeJoin(p.MITER);
+        } else {
+            tex.fill(hue, saturation, brightness, alpha);
+            tex.noStroke();
+        }
     }
 
     /**
