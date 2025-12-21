@@ -4,6 +4,11 @@
 export type Waveform = 'sine' | 'saw' | 'square' | 'noise';
 
 /**
+ * LFO waveform types
+ */
+export type LfoType = 'sine' | 'saw' | 'square' | 'triangle' | 'noise';
+
+/**
  * ADSR envelope phases (ADSRエンベロープのフェーズ)
  */
 export type ADSRPhase =
@@ -15,29 +20,88 @@ export type ADSRPhase =
 
 /**
  * Color parameters for SynthObject
- * パレット色を指定した場合、HSB値より優先されます
+ * 全てオプショナル。paletteColorを指定するとHSB値より優先
  */
 export interface ColorParams {
-    hue: number;        // 0-360
-    saturation: number; // 0-100
-    brightness: number; // 0-100
+    /** 色相（0-360、デフォルト: 0） */
+    hue?: number;
+    /** 彩度（0-100、デフォルト: 0） */
+    saturation?: number;
+    /** 明度（0-100、デフォルト: 100） */
+    brightness?: number;
     /** パレット色（指定するとHSB値より優先） */
     paletteColor?: 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'CYAN' | 'BLUE' | 'PURPLE' | 'PINK';
 }
 
 /**
  * Synth parameters (time values are in beats)
+ * 全てオプショナル。デフォルト値が適用されます
  */
 export interface SynthParams {
-    attackTime: number;    // Attack time in beats
-    decayTime: number;     // Decay time in beats
-    sustainLevel: number;  // Sustain level (0.0-1.0)
-    releaseTime: number;   // Release time in beats
-    noteDuration: number;  // Note duration in beats (when to start release)
-    waveform: Waveform;    // Waveform type
-    lfoRate: number;       // LFO rate in Hz
-    lfoDepth: number;      // LFO depth in pixels
-    colorParams: ColorParams; // Color parameters
+    /** Attack time in beats（デフォルト: 0.1） */
+    attackTime?: number;
+    /** Decay time in beats（デフォルト: 0） */
+    decayTime?: number;
+    /** Sustain level 0.0-1.0（デフォルト: 1.0） */
+    sustainLevel?: number;
+    /** Release time in beats（デフォルト: 0.1） */
+    releaseTime?: number;
+    /** Note duration in beats（デフォルト: 1.0） */
+    noteDuration?: number;
+    /** Waveform type（デフォルト: 'sine'） */
+    waveform?: Waveform;
+    /** LFO waveform type（デフォルト: 'sine'） */
+    lfoType?: LfoType;
+    /** LFO rate in Hz（デフォルト: 0） */
+    lfoRate?: number;
+    /** LFO depth in pixels（デフォルト: 0） */
+    lfoDepth?: number;
+    /** Color parameters */
+    colorParams?: ColorParams;
+}
+
+/**
+ * 内部で使用する解決済みのSynthParams（全て必須）
+ */
+export interface ResolvedSynthParams {
+    attackTime: number;
+    decayTime: number;
+    sustainLevel: number;
+    releaseTime: number;
+    noteDuration: number;
+    waveform: Waveform;
+    lfoType: LfoType;
+    lfoRate: number;
+    lfoDepth: number;
+    colorParams: {
+        hue: number;
+        saturation: number;
+        brightness: number;
+        paletteColor?: 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'CYAN' | 'BLUE' | 'PURPLE' | 'PINK';
+    };
+}
+
+/**
+ * SynthParamsにデフォルト値を適用
+ */
+export function resolveSynthParams(params: SynthParams = {}): ResolvedSynthParams {
+    return {
+        attackTime: params.attackTime ?? 0.1,
+        decayTime: params.decayTime ?? 0,
+        sustainLevel: params.sustainLevel ?? 1.0,
+        releaseTime: params.releaseTime ?? 0.1,
+        noteDuration: params.noteDuration ?? 1.0,
+        waveform: params.waveform ?? 'sine',
+        lfoType: params.lfoType ?? 'sine',
+        lfoRate: params.lfoRate ?? 0,
+        lfoDepth: params.lfoDepth ?? 0,
+        colorParams: {
+            hue: params.colorParams?.hue ?? 0,
+            saturation: params.colorParams?.saturation ?? 0,
+            brightness: params.colorParams?.brightness ?? 100,
+            paletteColor: params.colorParams?.paletteColor,
+        },
+    };
 }
 
 /**
@@ -55,12 +119,12 @@ export interface MovementParams {
     angle: number;
     /** 移動距離（ピクセル） */
     distance: number;
-    /** 角度LFOを有効化 */
-    angleLFO: boolean;
-    /** 角度LFOレート（Hz） */
-    angleLFORate: number;
-    /** 角度LFO深度（度） */
-    angleLFODepth: number;
+    /** 角度LFOを有効化（デフォルト: false） */
+    angleLFO?: boolean;
+    /** 角度LFOレート（Hz、デフォルト: 0） */
+    angleLFORate?: number;
+    /** 角度LFO深度（度、デフォルト: 0） */
+    angleLFODepth?: number;
     /** イージング関数（デフォルト: linear） */
     easing?: EasingFunction;
 }
@@ -74,4 +138,3 @@ export interface MovementParams {
 export function beatsToMs(beats: number, bpm: number): number {
     return (beats * 60000) / bpm;
 }
-

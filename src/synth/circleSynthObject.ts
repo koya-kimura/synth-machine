@@ -22,26 +22,26 @@ export class CircleSynthObject extends BaseSynthObject {
     /**
      * CircleSynthObjectを生成
      * 
-     * @param x - X座標
-     * @param y - Y座標
      * @param startTime - 生成時刻
      * @param bpm - BPM
-     * @param params - シンセサイザーパラメータ
-     * @param baseSize - 基本サイズ（半径）
+     * @param x - X座標
+     * @param y - Y座標
+     * @param baseSize - 基本サイズ（半径、デフォルト: 50）
+     * @param params - シンセサイザーパラメータ（オプショナル）
      * @param movementParams - 移動パラメータ（オプショナル）
      * @param ellipseParams - 楕円パラメータ（オプショナル）
      */
     constructor(
-        x: number,
-        y: number,
         startTime: number,
         bpm: number,
-        params: SynthParams,
+        x: number,
+        y: number,
         baseSize: number = 50,
+        params: SynthParams = {},
         movementParams?: MovementParams,
         ellipseParams?: EllipseParams
     ) {
-        super(x, y, startTime, bpm, params, baseSize, movementParams);
+        super(startTime, bpm, x, y, baseSize, params, movementParams);
         this.aspectRatio = ellipseParams?.aspectRatio ?? 1.0;
     }
 

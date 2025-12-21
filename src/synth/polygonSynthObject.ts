@@ -6,20 +6,18 @@ import { BaseSynthObject } from "./baseSynthObject";
  * 多角形固有のパラメータ
  */
 export interface PolygonParams {
-    /** 辺の数（3=三角形, 4=四角形, 5=五角形, ...） */
-    sides: number;
-    /** 基本半径（ピクセル） */
-    baseRadius: number;
-    /** 不規則性（0.0=正多角形, 1.0=完全ランダム） */
-    irregularity: number;
-    /** 窪み度（0.0=通常, 1.0=星形、負の値で膨らむ） */
-    spikiness: number;
-    /** 頂点ごとのLFOを有効化 */
-    vertexLFO: boolean;
-    /** 頂点LFOのレート（Hz） */
-    vertexLFORate: number;
-    /** 頂点LFOの深度（ピクセル） */
-    vertexLFODepth: number;
+    /** 辺の数（3=三角形, 4=四角形, 5=五角形, ...、デフォルト: 6） */
+    sides?: number;
+    /** 不規則性（0.0=正多角形, 1.0=完全ランダム、デフォルト: 0） */
+    irregularity?: number;
+    /** 窪み度（0.0=通常, 1.0=星形、負の値で膨らむ、デフォルト: 0） */
+    spikiness?: number;
+    /** 頂点ごとのLFOを有効化（デフォルト: false） */
+    vertexLFO?: boolean;
+    /** 頂点LFOのレート（Hz、デフォルト: 0） */
+    vertexLFORate?: number;
+    /** 頂点LFOの深度（ピクセル、デフォルト: 0） */
+    vertexLFODepth?: number;
 }
 
 /**
@@ -41,8 +39,8 @@ interface Vertex {
  * 各頂点に独立したLFOを適用することも可能です。
  */
 export class PolygonSynthObject extends BaseSynthObject {
-    /** 多角形固有のパラメータ */
-    private polygonParams: PolygonParams;
+    /** 多角形固有のパラメータ（解決済み） */
+    private polygonParams: Required<PolygonParams>;
 
     /** 頂点情報（インスタンス生成時に計算） */
     private vertices: Vertex[];
@@ -50,25 +48,36 @@ export class PolygonSynthObject extends BaseSynthObject {
     /**
      * PolygonSynthObjectを生成
      * 
-     * @param x - X座標
-     * @param y - Y座標
      * @param startTime - 生成時刻
      * @param bpm - BPM
-     * @param params - シンセサイザーパラメータ
-     * @param polygonParams - 多角形固有のパラメータ
+     * @param x - X座標
+     * @param y - Y座標
+     * @param baseSize - 基本サイズ（半径、デフォルト: 50）
+     * @param params - シンセサイザーパラメータ（オプショナル）
+     * @param polygonParams - 多角形固有のパラメータ（オプショナル）
      * @param movementParams - 移動パラメータ（オプショナル）
      */
     constructor(
-        x: number,
-        y: number,
         startTime: number,
         bpm: number,
-        params: SynthParams,
-        polygonParams: PolygonParams,
+        x: number,
+        y: number,
+        baseSize: number = 50,
+        params: SynthParams = {},
+        polygonParams: PolygonParams = {},
         movementParams?: MovementParams
     ) {
-        super(x, y, startTime, bpm, params, polygonParams.baseRadius, movementParams);
-        this.polygonParams = polygonParams;
+        super(startTime, bpm, x, y, baseSize, params, movementParams);
+
+        // デフォルト値を適用
+        this.polygonParams = {
+            sides: polygonParams.sides ?? 6,
+            irregularity: polygonParams.irregularity ?? 0,
+            spikiness: polygonParams.spikiness ?? 0,
+            vertexLFO: polygonParams.vertexLFO ?? false,
+            vertexLFORate: polygonParams.vertexLFORate ?? 0,
+            vertexLFODepth: polygonParams.vertexLFODepth ?? 0,
+        };
 
         // 頂点情報を生成
         this.vertices = this.generateVertices();
@@ -84,7 +93,7 @@ export class PolygonSynthObject extends BaseSynthObject {
 
         for (let i = 0; i < this.vertices.length; i++) {
             const vertex = this.vertices[i];
-            const { x, y } = this.calculateVertexPosition(p, vertex, i);
+            const { x, y } = this.calculateVertexPosition(p, vertex);
             tex.vertex(x, y);
         }
 
@@ -115,7 +124,7 @@ export class PolygonSynthObject extends BaseSynthObject {
             }
 
             // 基本半径
-            let radius = this.polygonParams.baseRadius;
+            let radius = this.baseSize;
 
             // 窪み（星形）を適用
             if (this.polygonParams.spikiness !== 0) {
@@ -144,7 +153,7 @@ export class PolygonSynthObject extends BaseSynthObject {
     /**
      * 頂点の現在位置を計算
      */
-    private calculateVertexPosition(p: p5, vertex: Vertex, _index: number): { x: number; y: number } {
+    private calculateVertexPosition(p: p5, vertex: Vertex): { x: number; y: number } {
         // ADSRレベルを適用した半径
         let radius = vertex.baseRadius * this.currentLevel;
 

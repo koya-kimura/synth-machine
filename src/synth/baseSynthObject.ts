@@ -1,6 +1,6 @@
 import p5 from "p5";
-import type { SynthParams, ADSRPhase, MovementParams, EasingFunction } from "./synthTypes";
-import { beatsToMs } from "./synthTypes";
+import type { SynthParams, ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams } from "./synthTypes";
+import { beatsToMs, resolveSynthParams } from "./synthTypes";
 import { linear } from "../utils/math/easing";
 import { getSynthColorHSB, type SynthColorKey } from "../utils/color/colorPalette";
 
@@ -35,8 +35,8 @@ export abstract class BaseSynthObject {
     /** BPM（Beats Per Minute） */
     protected bpm: number;
 
-    /** シンセサイザーパラメータ */
-    protected params: SynthParams;
+    /** シンセサイザーパラメータ（解決済み） */
+    protected params: ResolvedSynthParams;
 
     /** 現在のADSRフェーズ */
     protected currentPhase: ADSRPhase;
@@ -80,30 +80,32 @@ export abstract class BaseSynthObject {
     /**
      * BaseSynthObjectを生成
      * 
-     * @param x - X座標
-     * @param y - Y座標
      * @param startTime - 生成時刻（p.millis()の値）
      * @param bpm - BPM
-     * @param params - シンセサイザーパラメータ
+     * @param x - X座標
+     * @param y - Y座標
      * @param baseSize - 基本サイズ（デフォルト: 50）
+     * @param params - シンセサイザーパラメータ（オプショナル、デフォルト値あり）
      * @param movementParams - 移動パラメータ（オプショナル）
      */
     constructor(
-        x: number,
-        y: number,
         startTime: number,
         bpm: number,
-        params: SynthParams,
+        x: number,
+        y: number,
         baseSize: number = 50,
+        params: SynthParams = {},
         movementParams?: MovementParams
     ) {
+        // パラメータにデフォルト値を適用
+        this.params = resolveSynthParams(params);
+
         this.x = x;
         this.y = y;
         this.startX = x;
         this.startY = y;
         this.startTime = startTime;
         this.bpm = bpm;
-        this.params = params;
         this.baseSize = baseSize;
         this.currentPhase = 'ATTACK';
         this.currentLevel = 0;
@@ -113,10 +115,10 @@ export abstract class BaseSynthObject {
         this.randomSeed = Math.random() * 10000;
 
         // ビート単位の時間をミリ秒に変換
-        this.attackMs = beatsToMs(params.attackTime, bpm);
-        this.decayMs = beatsToMs(params.decayTime, bpm);
-        this.releaseMs = beatsToMs(params.releaseTime, bpm);
-        this.noteDurationMs = beatsToMs(params.noteDuration, bpm);
+        this.attackMs = beatsToMs(this.params.attackTime, bpm);
+        this.decayMs = beatsToMs(this.params.decayTime, bpm);
+        this.releaseMs = beatsToMs(this.params.releaseTime, bpm);
+        this.noteDurationMs = beatsToMs(this.params.noteDuration, bpm);
 
         // 全生存時間を計算（Attack開始〜Release終了）
         this.totalLifetimeMs = this.noteDurationMs + this.releaseMs;
@@ -137,7 +139,7 @@ export abstract class BaseSynthObject {
     update(p: p5): void {
         const elapsed = p.millis() - this.startTime;
         this.updateADSREnvelope(elapsed);
-        this.updatePosition(p, elapsed);
+        this.updatePosition(elapsed);
     }
 
     /**
@@ -244,10 +246,9 @@ export abstract class BaseSynthObject {
     /**
      * 位置を更新
      * 
-     * @param p - p5インスタンス
      * @param elapsed - 生成からの経過時間（ミリ秒）
      */
-    protected updatePosition(p: p5, elapsed: number): void {
+    protected updatePosition(elapsed: number): void {
         if (!this.movementParams) {
             return; // 移動パラメータがなければ何もしない
         }
@@ -265,8 +266,9 @@ export abstract class BaseSynthObject {
         // 角度LFOを適用
         if (this.movementParams.angleLFO) {
             const time = elapsed / 1000; // 秒単位
-            const angleLFOValue = Math.sin(time * this.movementParams.angleLFORate * Math.PI * 2)
-                * this.movementParams.angleLFODepth;
+            const angleLFORate = this.movementParams.angleLFORate ?? 0;
+            const angleLFODepth = this.movementParams.angleLFODepth ?? 0;
+            const angleLFOValue = Math.sin(time * angleLFORate * Math.PI * 2) * angleLFODepth;
             angle += angleLFOValue;
         }
 
@@ -283,14 +285,60 @@ export abstract class BaseSynthObject {
     // ========================================
 
     /**
+     * LFO波形の値を計算（-1〜1）
+     * 
+     * @param phase - 位相（0〜1）
+     * @returns 波形の値（-1〜1）
+     */
+    private calculateLfoWaveform(phase: number): number {
+        const normalizedPhase = phase % 1;
+
+        switch (this.params.lfoType) {
+            case 'sine':
+                return Math.sin(normalizedPhase * Math.PI * 2);
+            case 'triangle':
+                // 0→1→0→-1→0 の三角波
+                const t = normalizedPhase * 4;
+                if (t < 1) return t;
+                if (t < 3) return 2 - t;
+                return t - 4;
+            case 'saw':
+                // 0→1→0 の鋸波（上昇）
+                return normalizedPhase * 2 - 1;
+            case 'square':
+                // 0.5未満で1、0.5以上で-1
+                return normalizedPhase < 0.5 ? 1 : -1;
+            case 'noise':
+                // ランダム（シード付きで一貫性を持たせる）
+                return (Math.sin(normalizedPhase * 12345.6789 + this.randomSeed) * 43758.5453) % 2 - 1;
+            default:
+                return Math.sin(normalizedPhase * Math.PI * 2);
+        }
+    }
+
+    /**
      * LFO（Low Frequency Oscillator）の値を計算
+     * 
+     * lfoRate: 1拍あたりの周期数（1=1拍で1周期、2=1拍で2周期）
+     * lfoDepth: baseSizeに対する割合（1.0=baseSize分の振幅）
      * 
      * @param p - p5インスタンス
      * @returns LFOによる変調値（ピクセル）
      */
     protected calculateLFO(p: p5): number {
+        // lfoRateかlfoDepthが0なら適用しない
+        if (this.params.lfoRate === 0 || this.params.lfoDepth === 0) {
+            return 0;
+        }
+
         const time = (p.millis() - this.startTime) / 1000;
-        return Math.sin(time * this.params.lfoRate * Math.PI * 2) * this.params.lfoDepth;
+        // BPM同期: 1拍 = 60/bpm秒、1拍でlfoRate周期
+        const beatsPerSecond = this.bpm / 60;
+        const phase = time * beatsPerSecond * this.params.lfoRate;
+
+        // lfoDepthはbaseSizeに対する割合
+        const amplitude = this.baseSize * this.params.lfoDepth;
+        return this.calculateLfoWaveform(phase) * amplitude;
     }
 
     /**
@@ -301,8 +349,19 @@ export abstract class BaseSynthObject {
      * @returns LFOによる変調値（ピクセル）
      */
     protected calculateLFOWithOffset(p: p5, phaseOffset: number): number {
+        // lfoRateかlfoDepthが0なら適用しない
+        if (this.params.lfoRate === 0 || this.params.lfoDepth === 0) {
+            return 0;
+        }
+
         const time = (p.millis() - this.startTime) / 1000;
-        return Math.sin((time * this.params.lfoRate + phaseOffset) * Math.PI * 2) * this.params.lfoDepth;
+        // BPM同期: 1拍 = 60/bpm秒、1拍でlfoRate周期
+        const beatsPerSecond = this.bpm / 60;
+        const phase = time * beatsPerSecond * this.params.lfoRate + phaseOffset;
+
+        // lfoDepthはbaseSizeに対する割合
+        const amplitude = this.baseSize * this.params.lfoDepth;
+        return this.calculateLfoWaveform(phase) * amplitude;
     }
 
     /**

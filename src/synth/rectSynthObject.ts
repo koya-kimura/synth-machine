@@ -6,20 +6,18 @@ import { BaseSynthObject } from "./baseSynthObject";
  * 長方形固有のパラメータ
  */
 export interface RectParams {
-    /** 基本幅（ピクセル） */
-    baseWidth: number;
-    /** 基本高さ（ピクセル） */
-    baseHeight: number;
     /** 伸縮モード: 'uniform'=均一, 'horizontal'=水平, 'vertical'=垂直 */
-    stretchMode: 'uniform' | 'horizontal' | 'vertical';
-    /** 幅のLFOレート（Hz） */
-    lfoWidthRate: number;
-    /** 幅のLFO深度（ピクセル） */
-    lfoWidthDepth: number;
-    /** 高さのLFOレート（Hz） */
-    lfoHeightRate: number;
-    /** 高さのLFO深度（ピクセル） */
-    lfoHeightDepth: number;
+    stretchMode?: 'uniform' | 'horizontal' | 'vertical';
+    /** アスペクト比（幅/高さ、デフォルト: 1.0） */
+    aspectRatio?: number;
+    /** 幅のLFOレート（Hz、デフォルト: 0） */
+    lfoWidthRate?: number;
+    /** 幅のLFO深度（ピクセル、デフォルト: 0） */
+    lfoWidthDepth?: number;
+    /** 高さのLFOレート（Hz、デフォルト: 0） */
+    lfoHeightRate?: number;
+    /** 高さのLFO深度（ピクセル、デフォルト: 0） */
+    lfoHeightDepth?: number;
 }
 
 /**
@@ -29,32 +27,42 @@ export interface RectParams {
  * 伸縮モードにより、細長く伸びるアニメーションなどが可能です。
  */
 export class RectSynthObject extends BaseSynthObject {
-    /** 長方形固有のパラメータ */
-    private rectParams: RectParams;
+    /** 長方形固有のパラメータ（解決済み） */
+    private rectParams: Required<RectParams>;
 
     /**
      * RectSynthObjectを生成
      * 
-     * @param x - X座標
-     * @param y - Y座標
      * @param startTime - 生成時刻
      * @param bpm - BPM
-     * @param params - シンセサイザーパラメータ
-     * @param rectParams - 長方形固有のパラメータ
+     * @param x - X座標
+     * @param y - Y座標
+     * @param baseSize - 基本サイズ（デフォルト: 50）
+     * @param params - シンセサイザーパラメータ（オプショナル）
+     * @param rectParams - 長方形固有のパラメータ（オプショナル）
      * @param movementParams - 移動パラメータ（オプショナル）
      */
     constructor(
-        x: number,
-        y: number,
         startTime: number,
         bpm: number,
-        params: SynthParams,
-        rectParams: RectParams,
+        x: number,
+        y: number,
+        baseSize: number = 50,
+        params: SynthParams = {},
+        rectParams: RectParams = {},
         movementParams?: MovementParams
     ) {
-        // baseSizeは使用しないが、互換性のため0を渡す
-        super(x, y, startTime, bpm, params, 0, movementParams);
-        this.rectParams = rectParams;
+        super(startTime, bpm, x, y, baseSize, params, movementParams);
+
+        // デフォルト値を適用
+        this.rectParams = {
+            stretchMode: rectParams.stretchMode ?? 'uniform',
+            aspectRatio: rectParams.aspectRatio ?? 1.0,
+            lfoWidthRate: rectParams.lfoWidthRate ?? 0,
+            lfoWidthDepth: rectParams.lfoWidthDepth ?? 0,
+            lfoHeightRate: rectParams.lfoHeightRate ?? 0,
+            lfoHeightDepth: rectParams.lfoHeightDepth ?? 0,
+        };
     }
 
     /**
@@ -76,44 +84,41 @@ export class RectSynthObject extends BaseSynthObject {
         const time = (p.millis() - this.startTime) / 1000;
 
         // 基本サイズにADSRレベルを適用
-        let baseW = this.rectParams.baseWidth * this.currentLevel;
-        let baseH = this.rectParams.baseHeight * this.currentLevel;
+        const baseW = this.baseSize * this.currentLevel * this.rectParams.aspectRatio;
+        const baseH = this.baseSize * this.currentLevel;
+
+        let width = baseW;
+        let height = baseH;
 
         // 伸縮モードに応じてLFOを適用
         switch (this.rectParams.stretchMode) {
             case 'uniform': {
                 // 均一: 共通のLFOを適用
                 const lfo = this.calculateLFO(p);
-                baseW += lfo;
-                baseH += lfo;
+                width += lfo * this.rectParams.aspectRatio;
+                height += lfo;
                 break;
             }
             case 'horizontal': {
                 // 水平: 幅にのみLFOを適用
                 const lfoW = Math.sin(time * this.rectParams.lfoWidthRate * Math.PI * 2) * this.rectParams.lfoWidthDepth;
-                baseW += lfoW;
+                width += lfoW;
+                // 高さにも少し影響
+                const lfoH = Math.sin(time * this.rectParams.lfoHeightRate * Math.PI * 2) * this.rectParams.lfoHeightDepth * 0.3;
+                height += lfoH;
                 break;
             }
             case 'vertical': {
                 // 垂直: 高さにのみLFOを適用
                 const lfoH = Math.sin(time * this.rectParams.lfoHeightRate * Math.PI * 2) * this.rectParams.lfoHeightDepth;
-                baseH += lfoH;
+                height += lfoH;
+                // 幅にも少し影響
+                const lfoW = Math.sin(time * this.rectParams.lfoWidthRate * Math.PI * 2) * this.rectParams.lfoWidthDepth * 0.3;
+                width += lfoW;
                 break;
             }
         }
 
-        // 幅と高さにそれぞれ独立したLFOを追加（stretchMode関係なく）
-        if (this.rectParams.stretchMode !== 'uniform') {
-            const lfoW = Math.sin(time * this.rectParams.lfoWidthRate * Math.PI * 2) * this.rectParams.lfoWidthDepth;
-            const lfoH = Math.sin(time * this.rectParams.lfoHeightRate * Math.PI * 2) * this.rectParams.lfoHeightDepth;
-
-            if (this.rectParams.stretchMode === 'vertical') {
-                baseW += lfoW * 0.3; // 垂直モードでも少し幅に影響
-            } else if (this.rectParams.stretchMode === 'horizontal') {
-                baseH += lfoH * 0.3; // 水平モードでも少し高さに影響
-            }
-        }
-
-        return { width: Math.max(1, baseW), height: Math.max(1, baseH) };
+        return { width: Math.max(1, width), height: Math.max(1, height) };
     }
 }

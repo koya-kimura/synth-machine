@@ -236,6 +236,14 @@ export class BPMManager {
     return this.bpm;
   }
 
+  /**
+   * ビートをリセットします
+   * これにより、曲の頭出しのような挙動になります。
+   */
+  public resetBeat(): void {
+    this.beatCount = 0;
+  }
+
   // --- タップテンポ機能 ---
 
   /**

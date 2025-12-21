@@ -214,6 +214,9 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
       if (p.keyCode === 13) {
         bpmManager.tapTempo();
       }
+      if (p.keyCode === 16) {
+        bpmManager.resetBeat();
+      }
       // オーディオコンテキストを再開（ユーザー操作が必要）
       audioManager?.resume().catch(() => undefined);
     },
