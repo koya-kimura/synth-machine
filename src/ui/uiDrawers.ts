@@ -300,7 +300,7 @@ export const uiDebug: UIDrawFunction = (
 
   // 右上：オーディオスペクトラム
   tex.push();
-  const spectrumHeight = tex.height * 0.15;
+  const spectrumHeight = tex.height * 0.1;
   const spectrumWidth = tex.width * 0.35;
   const spectrumX = tex.width - spectrumWidth - margin;
   const spectrumY = margin;

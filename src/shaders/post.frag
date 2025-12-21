@@ -21,7 +21,7 @@ void main(void) {
         uv = mosaic(uv, mosaicNum, u_resolution);
     }
     if(getFaderValue(3) > 0.0){
-        float distortionAmount = map(getFaderValue(3), 0.0, 1.0, 0.0, 10.0);
+        float distortionAmount = map(getFaderValue(3), 0.0, 1.0, 0.0, 3.0);
         uv = distortion(uv, distortionAmount);
     }
 

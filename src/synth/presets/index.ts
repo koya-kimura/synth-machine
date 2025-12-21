@@ -9,6 +9,9 @@ import { kick03 } from "./kick03";
 import { snare01 } from "./snare01";
 import { snare02 } from "./snare02";
 import { snare03 } from "./snare03";
+import { hihat01 } from "./hihat01";
+import { hihat02 } from "./hihat02";
+import { hihat03 } from "./hihat03";
 
 /**
  * プリセット配列
@@ -21,4 +24,7 @@ export const PRESETS: Array<(p: p5, bpm: number, startTime: number) => BaseSynth
     snare01,
     snare02,
     snare03,
+    hihat01,
+    hihat02,
+    hihat03,
 ];
