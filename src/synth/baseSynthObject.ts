@@ -77,6 +77,9 @@ export abstract class BaseSynthObject {
     protected styleMode: 'fill' | 'stroke';
     protected strokeWeight: number;
 
+    /** プリセットインデックス（描画順制御用） */
+    public presetIndex: number;
+
     // ========================================
     // コンストラクタ
     // ========================================
@@ -119,6 +122,9 @@ export abstract class BaseSynthObject {
         // スタイルパラメータを設定
         this.styleMode = config.style?.mode ?? 'fill';
         this.strokeWeight = config.style?.strokeWeight ?? 1;
+
+        // プリセットインデックスを設定
+        this.presetIndex = config.presetIndex ?? 0;
     }
 
     // ========================================
@@ -259,12 +265,14 @@ export abstract class BaseSynthObject {
         // 角度を計算（度→ラジアン）
         let angle = this.movementParams.angle;
 
-        // 角度LFOを適用
+        // 角度LFOを適用（BPM同期）
         if (this.movementParams.angleLFO) {
             const time = elapsed / 1000; // 秒単位
+            const beatsPerSecond = this.bpm / 60;
             const angleLFORate = this.movementParams.angleLFORate ?? 0;
             const angleLFODepth = this.movementParams.angleLFODepth ?? 0;
-            const angleLFOValue = Math.sin(time * angleLFORate * Math.PI * 2) * angleLFODepth;
+            const phase = time * beatsPerSecond * angleLFORate;
+            const angleLFOValue = Math.sin(phase * Math.PI * 2) * angleLFODepth;
             angle += angleLFOValue;
         }
 

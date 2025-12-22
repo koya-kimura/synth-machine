@@ -30,7 +30,7 @@ export interface ColorParams {
     /** 明度（0-100、デフォルト: 100） */
     brightness?: number;
     /** パレット色（指定するとHSB値より優先） */
-    paletteColor?: 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'CYAN' | 'BLUE' | 'PURPLE' | 'PINK';
+    paletteColor?: 'RED' | 'RED_PURPLE' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'LIGHT_BLUE' | 'BLUE' | 'DARK_BLUE' | 'PINK' | 'PURPLE' | 'BROWN';
 }
 
 /**
@@ -74,7 +74,7 @@ export interface ResolvedSynthParams {
         hue: number;
         saturation: number;
         brightness: number;
-        paletteColor?: 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'CYAN' | 'BLUE' | 'PURPLE' | 'PINK';
+        paletteColor?: 'RED' | 'RED_PURPLE' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'LIGHT_BLUE' | 'BLUE' | 'DARK_BLUE' | 'PINK' | 'PURPLE' | 'BROWN';
     };
 }
 
@@ -117,7 +117,7 @@ export interface MovementParams {
     distance: number;
     /** 角度LFOを有効化（デフォルト: false） */
     angleLFO?: boolean;
-    /** 角度LFOレート（Hz、デフォルト: 0） */
+    /** 角度LFOレート（拍あたり周期数、デフォルト: 0） */
     angleLFORate?: number;
     /** 角度LFO深度（ラジアン、デフォルト: 0） */
     angleLFODepth?: number;
@@ -169,6 +169,8 @@ export interface SynthObjectConfig {
     movement?: MovementParams;
     /** スタイルパラメータ（オプショナル） */
     style?: StyleParams;
+    /** プリセットインデックス（描画順制御用、内部使用） */
+    presetIndex?: number;
 }
 
 

@@ -14,9 +14,9 @@ export interface PolygonParams {
     spikiness?: number;
     /** 頂点ごとのLFOを有効化（デフォルト: false） */
     vertexLFO?: boolean;
-    /** 頂点LFOのレート（Hz、デフォルト: 0） */
+    /** 頂点LFOのレート（拍あたり周期数、デフォルト: 0） */
     vertexLFORate?: number;
-    /** 頂点LFOの深度（ピクセル、デフォルト: 0） */
+    /** 頂点LFOの深度（baseSizeに対する割合、デフォルト: 0） */
     vertexLFODepth?: number;
 }
 
@@ -171,11 +171,14 @@ export class PolygonSynthObject extends BaseSynthObject {
 
     /**
      * 頂点ごとのLFO値を計算
+     * vertexLFORate: 1拍あたりの周期数（1=1拍で1周期）
      */
     private calculateVertexLFO(p: p5, phaseOffset: number): number {
         const time = (p.millis() - this.startTime) / 1000;
-        return Math.sin((time * this.polygonParams.vertexLFORate + phaseOffset) * Math.PI * 2)
-            * this.polygonParams.vertexLFODepth;
+        // BPM同期: 1拍 = 60/bpm秒
+        const beatsPerSecond = this.bpm / 60;
+        const phase = time * beatsPerSecond * this.polygonParams.vertexLFORate + phaseOffset;
+        return Math.sin(phase * Math.PI * 2) * this.polygonParams.vertexLFODepth * this.baseSize;
     }
 
     /**

@@ -169,8 +169,8 @@ new PolygonSynthObject({
 | `irregularity` | 不規則性（0-1） | 0 |
 | `spikiness` | 窪み度（0=通常、0.5=星形） | 0 |
 | `vertexLFO` | 頂点LFO有効化 | false |
-| `vertexLFORate` | 頂点LFOレート（Hz） | 0 |
-| `vertexLFODepth` | 頂点LFO深度（px） | 0 |
+| `vertexLFORate` | 頂点LFOレート（拍あたり周期数） | 0 |
+| `vertexLFODepth` | 頂点LFO深度（baseSize比） | 0 |
 
 ---
 
@@ -192,7 +192,7 @@ movement: {
 | `angle` | 移動角度（ラジアン、0=右、π/2=下、π=左、3π/2=上） | - |
 | `distance` | 移動距離（ピクセル） | - |
 | `angleLFO` | 角度LFO有効化 | false |
-| `angleLFORate` | 角度LFOレート（Hz） | 0 |
+| `angleLFORate` | 角度LFOレート（拍あたり周期数） | 0 |
 | `angleLFODepth` | 角度LFO深度（ラジアン） | 0 |
 | `easing` | イージング関数 | linear |
 

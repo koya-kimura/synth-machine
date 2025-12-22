@@ -33,7 +33,7 @@ export const snare03 = (p: p5, bpm: number, startTime: number): BaseSynthObject[
                     lfoRate: 4.0,
                     lfoDepth: 0.5,
                     colorParams: {
-                        paletteColor: 'CYAN',
+                        paletteColor: 'LIGHT_BLUE',
                     },
                 },
                 polygon: {

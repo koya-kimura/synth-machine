@@ -20,6 +20,28 @@ export const LED_PALETTE = {
   PINK: 56,
 } as const;
 
+/** プリセットカテゴリごとのLED色 */
+export const CATEGORY_LED_COLORS: Record<string, number> = {
+  kick: LED_PALETTE.RED,
+  bass: LED_PALETTE.ORANGE,
+  snare: LED_PALETTE.YELLOW,
+  hihat: LED_PALETTE.GREEN,
+  percussion: LED_PALETTE.CYAN,
+  lead: LED_PALETTE.BLUE,
+  pad: LED_PALETTE.PURPLE,
+  fx: LED_PALETTE.PINK,
+};
+
+/**
+ * プリセット名からカテゴリを抽出してLED色を取得
+ * @param presetName プリセット名（例: "kick01"）
+ * @returns LED色の値
+ */
+export function getPresetCategoryColor(presetName: string): number {
+  const category = presetName.replace(/\d+$/, ''); // 末尾の数字を削除
+  return CATEGORY_LED_COLORS[category] ?? LED_PALETTE.DIM;
+}
+
 /** ページごとのLED色（LED_PALETTEを参照） */
 export const PAGE_LED_PALETTE = [
   LED_PALETTE.RED, // page 0

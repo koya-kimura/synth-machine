@@ -5,15 +5,15 @@ import { map } from "../../utils/math/mathUtils";
 import { easeOutQuad } from "../../utils/math/easing";
 
 /**
- * プリセット: bass01
+ * プリセット: bass03
  * 放射状に広がる円
  */
-export const bass01 = (p: p5, bpm: number, startTime: number): BaseSynthObject[] => {
+export const bass03 = (p: p5, bpm: number, startTime: number): BaseSynthObject[] => {
     let objects: BaseSynthObject[] = [];
 
     const x = p.width * 0.5;
-    const y = p.height;
-    const h = p.height * 0.1;
+    const y = p.height * 0.5;
+    const h = p.height;
 
     objects.push(
         new RectSynthObject({
@@ -24,25 +24,24 @@ export const bass01 = (p: p5, bpm: number, startTime: number): BaseSynthObject[]
             size: h,
             angle: 0,
             params: {
-                attackTime: 0.125,
+                attackTime: 0,
                 decayTime: 0.5,
                 sustainLevel: 1.0,
-                releaseTime: 0.125,
-                lfoType: 'sine',
-                lfoRate: 0.5,
-                lfoDepth: 1.5,
+                releaseTime: 0,
+                lfoType: 'square',
+                lfoRate: 20.0,
+                lfoDepth: 0.1,
                 colorParams: {
-                    paletteColor: 'BLUE',
+                    paletteColor: 'PURPLE',
                 },
             },
-            movement: {
-                angle: -Math.PI * 0.5,
-                distance: p.height,
-                easing: easeOutQuad,
+            style: {
+                mode: 'stroke',
+                strokeWeight: Math.min(p.width, p.height) * 0.2
             },
             rect: {
-                stretchMode: 'vertical',
-                aspectRatio: p.width / h,
+                stretchMode: 'uniform',
+                aspectRatio: p.width / p.height,
             }
         })
     );

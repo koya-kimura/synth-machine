@@ -14,6 +14,9 @@ import { map } from "../utils/math/mathUtils";
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
  */
 export class VisualComposer {
+  /** オブジェクト数の上限 */
+  private static readonly MAX_OBJECTS = 5000;
+
   private renderTexture: p5.Graphics | undefined; // ビジュアル描画用のオフスクリーンキャンバス
   private synthObjects: BaseSynthObject[] = []; // SynthObjectの配列
   private presets: Array<(p: p5, bpm: number, startTime: number) => BaseSynthObject[]>; // プリセットの配列
@@ -258,8 +261,9 @@ export class VisualComposer {
       tex.blendMode(p.ADD);
     }
 
-    // 全SynthObjectを描画
-    this.synthObjects.forEach(obj => obj.display(p, tex));
+    // 全SynthObjectをpresetIndex順にソートして描画（インデックスが小さいものが先に描画される）
+    const sortedObjects = [...this.synthObjects].sort((a, b) => a.presetIndex - b.presetIndex);
+    sortedObjects.forEach(obj => obj.display(p, tex));
 
     tex.pop();
   }
@@ -287,8 +291,19 @@ export class VisualComposer {
 
     // 指定されたプリセットを使用して複数オブジェクトをスポーン
     if (presetIndex >= 0 && presetIndex < this.presets.length) {
+      // オブジェクト数の上限チェック
+      if (this.synthObjects.length >= VisualComposer.MAX_OBJECTS) {
+        console.warn(`Object limit reached (${VisualComposer.MAX_OBJECTS}), skipping spawn`);
+        return;
+      }
+
       const preset = this.presets[presetIndex];
       const newObjects = preset(p, currentBPM, p.millis());
+
+      // 各オブジェクトにpresetIndexを設定
+      newObjects.forEach(obj => {
+        obj.presetIndex = presetIndex;
+      });
 
       // スポーンされた全オブジェクトを配列に追加
       this.synthObjects.push(...newObjects);

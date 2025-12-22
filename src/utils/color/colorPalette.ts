@@ -48,17 +48,20 @@ export const getPalette = (index: number): ColorPalette => {
 
 /**
  * SynthObject用カラーパレット
- * コントラストの高い虹色8色（HEX形式）
+ * コントラストの高い11色（HEX形式）
  */
 export const SYNTH_COLORS = {
-  RED: "#FF1744",       // 鮮やかな赤
-  ORANGE: "#FF9100",    // 鮮やかなオレンジ
-  YELLOW: "#FFEA00",    // 鮮やかな黄
-  GREEN: "#00E676",     // 鮮やかな緑
-  CYAN: "#00E5FF",      // 鮮やかなシアン
-  BLUE: "#2979FF",      // 鮮やかな青
-  PURPLE: "#D500F9",    // 鮮やかな紫
-  PINK: "#FF4081",      // 鮮やかなピンク
+  RED: "#C7190C",          // 赤
+  RED_PURPLE: "#A10648",   // 赤紫
+  ORANGE: "#FC4622",       // オレンジ
+  YELLOW: "#F2F300",       // 黄
+  GREEN: "#00E065",        // 緑
+  LIGHT_BLUE: "#78FFC7",   // ライトブルー
+  BLUE: "#4C00D2",         // 青
+  DARK_BLUE: "#1D0053",    // ダークブルー
+  PINK: "#FF50CB",         // ピンク
+  PURPLE: "#A52EF8",       // 紫
+  BROWN: "#B46600",        // 茶
 } as const;
 
 /** SYNTH_COLORSのキー型 */

@@ -3,7 +3,7 @@
  * APC Mini MK2のボタン・セルの設定を定義します。
  */
 import type { ButtonConfig, FaderButtonMode } from "../../types";
-import { LED_PALETTE } from "./ledPalette";
+import { LED_PALETTE, getPresetCategoryColor } from "./ledPalette";
 import { PRESETS } from "../../synth/presets";
 
 import { PRESET_PATTERNS } from "../../synth/patterns/presetPatterns";
@@ -16,16 +16,17 @@ import { PRESET_PATTERNS } from "../../synth/patterns/presetPatterns";
  */
 
 // プリセット用ボタン（動的生成）
-const PRESET_BUTTONS: ButtonConfig[] = PRESETS.map((_, index) => {
+const PRESET_BUTTONS: ButtonConfig[] = PRESETS.map((preset, index) => {
   const row = Math.floor(index / 8); // 0-3の行
   const col = index % 8;              // 0-7の列
+  const categoryColor = getPresetCategoryColor(preset.name);
 
   return {
     key: `preset${index}`,
     type: "oneshot" as const,
     cells: [{ page: 0, row, col }],
     activeColor: LED_PALETTE.ON,
-    inactiveColor: LED_PALETTE.CYAN,
+    inactiveColor: categoryColor,
   };
 }).slice(0, 32); // 最大32個まで（4行×8列）
 
