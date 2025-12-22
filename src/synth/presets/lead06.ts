@@ -37,7 +37,7 @@ export const lead06 = (p: p5, bpm: number, startTime: number): BaseSynthObject[]
                     lfoRate: r,
                     lfoDepth: 0.2,
                     colorParams: {
-                        paletteColor: 'YELLOW',
+                        paletteColor: 'RED_PURPLE',
                     },
                 },
                 style: {

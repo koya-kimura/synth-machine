@@ -33,6 +33,7 @@ import { lead03 } from "./lead03";
 import { lead04 } from "./lead04";
 import { lead05 } from "./lead05";
 import { lead06 } from "./lead06";
+import { lead07 } from "./lead07";
 
 import { pad01 } from "./pad01";
 
@@ -69,6 +70,7 @@ export const PRESETS: Array<(p: p5, bpm: number, startTime: number) => BaseSynth
     lead05,
 
     lead06,
+    lead07,
     hihat01,
     hihat02,
     hihat03,

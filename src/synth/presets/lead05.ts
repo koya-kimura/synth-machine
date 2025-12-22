@@ -33,7 +33,7 @@ export const lead05 = (p: p5, bpm: number, startTime: number): BaseSynthObject[]
                 lfoRate: 0.25,
                 lfoDepth: 0.5,
                 colorParams: {
-                    paletteColor: 'BLUE',
+                    paletteColor: UniformRandom.rand(startTime) < 0.5 ? 'BLUE' : 'GREEN',
                 },
             },
             polygon: {

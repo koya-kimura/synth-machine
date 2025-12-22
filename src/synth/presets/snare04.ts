@@ -30,7 +30,7 @@ export const snare04 = (p: p5, bpm: number, startTime: number): BaseSynthObject[
                 sustainLevel: 1.0,
                 releaseTime: 0,
                 colorParams: {
-                    paletteColor: 'LIGHT_BLUE',
+                    paletteColor: 'DARK_BLUE',
                 },
             },
             polygon: {

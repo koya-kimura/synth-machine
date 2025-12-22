@@ -37,7 +37,7 @@ export const hihat03 = (p: p5, bpm: number, startTime: number): BaseSynthObject[
                     lfoRate: 64.0,
                     lfoDepth: 0.1,
                     colorParams: {
-                        paletteColor: 'RED',
+                        paletteColor: 'PINK',
                     },
                 },
                 polygon: {

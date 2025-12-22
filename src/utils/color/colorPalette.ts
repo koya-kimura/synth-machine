@@ -55,12 +55,12 @@ export const SYNTH_COLORS = {
   RED_PURPLE: "#A10648",   // 赤紫
   ORANGE: "#FC4622",       // オレンジ
   YELLOW: "#F2F300",       // 黄
-  GREEN: "#00E065",        // 緑
-  LIGHT_BLUE: "#78FFC7",   // ライトブルー
+  GREEN: "#0e551dff",        // 緑
+  LIGHT_BLUE: "#39e1bfff",   // ライトブルー
   BLUE: "#4C00D2",         // 青
   DARK_BLUE: "#1D0053",    // ダークブルー
   PINK: "#FF50CB",         // ピンク
-  PURPLE: "#A52EF8",       // 紫
+  PURPLE: "#6c17a9ff",       // 紫
   BROWN: "#B46600",        // 茶
 } as const;
 

@@ -11,7 +11,7 @@ import { getPresetIndex } from "../presets";
 export const PRESET_PATTERNS: Pattern[] = [
     // パターン0: 4つ打ち（基本的なキックドラムパターン）
     {
-        name: "4つ打ち",
+        name: "Four Kick",
         events: [
             { beat: 0, presetIndex: getPresetIndex('kick01') },
             { beat: 1, presetIndex: getPresetIndex('kick01') },
@@ -25,7 +25,7 @@ export const PRESET_PATTERNS: Pattern[] = [
     },
     // パターン0: 4つ打ち（基本的なキックドラムパターン）
     {
-        name: "4つ打ち",
+        name: "Polygons",
         events: [
             { beat: 0, presetIndex: getPresetIndex('kick02') },
             { beat: 0.5, presetIndex: getPresetIndex('hihat01') },
@@ -47,7 +47,7 @@ export const PRESET_PATTERNS: Pattern[] = [
     },
     // パターン0: 4つ打ち（基本的なキックドラムパターン）
     {
-        name: "4つ打ち",
+        name: "Fly Move",
         events: [
             { beat: 0, presetIndex: getPresetIndex('lead05') },
             { beat: 0, presetIndex: getPresetIndex('snare04') },
@@ -61,7 +61,7 @@ export const PRESET_PATTERNS: Pattern[] = [
     },
     // パターン0: 4つ打ち（基本的なキックドラムパターン）
     {
-        name: "4つ打ち",
+        name: "Toggle Rect",
         events: [
             { beat: 0, presetIndex: getPresetIndex('bass01') },
             { beat: 2, presetIndex: getPresetIndex('bass01') },
@@ -76,5 +76,3 @@ export const PRESET_PATTERNS: Pattern[] = [
         ]
     },
 ];
-
-
