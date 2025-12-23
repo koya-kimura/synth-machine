@@ -39,6 +39,7 @@ import { pad01 } from "./pad01";
 
 import { fx01 } from "./fx01";
 import { fx02 } from "./fx02";
+import { fx03 } from "./fx03";
 
 /**
  * プリセット配列
@@ -77,6 +78,7 @@ export const PRESETS: Array<(p: p5, bpm: number, startTime: number) => BaseSynth
     pad01,
     fx01,
     fx02,
+    fx03,
 ];
 
 /**

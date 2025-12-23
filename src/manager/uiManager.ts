@@ -1,7 +1,7 @@
 import p5 from "p5";
 import type { VisualRenderContext } from "../types/render"; // 描画コンテキストの型定義
 import type { UIDrawFunction } from "../ui/uiDrawers"; // UI描画関数の型定義
-import { uiNone, uiDebug, uiInfo } from "../ui/uiDrawers"; // UI描画関数の実装
+import { uiInfo } from "../ui/uiDrawers"; // UI描画関数の実装
 
 // UI描画関数の配列。MIDI入力に基づいて選択される。
 const UI_DRAWERS: readonly UIDrawFunction[] = [uiInfo];
