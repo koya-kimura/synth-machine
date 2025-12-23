@@ -1,5 +1,3 @@
-import type p5 from "p5";
-
 /**
  * ループ記録されたイベント
  */
@@ -18,25 +16,23 @@ export class Looper {
     private isRecording: boolean = false;
     private isPlaying: boolean = false;
     private recordStartTime: number = 0;
-    private recordStartBeat: number = 0;
     private loopDuration: number = 0;
     private loopStartTime: number = 0;
 
     /**
      * 録音を開始
      */
-    startRecording(currentTime: number, currentBeat: number): void {
+    startRecording(currentTime: number, _currentBeat: number): void {
         this.isRecording = true;
         this.isPlaying = false;
         this.events = [];
         this.recordStartTime = currentTime;
-        this.recordStartBeat = currentBeat;
     }
 
     /**
      * 録音を停止して再生を開始
      */
-    stopRecordingAndPlay(currentTime: number, currentBeat: number): void {
+    stopRecordingAndPlay(currentTime: number, _currentBeat: number): void {
         this.isRecording = false;
 
         // イベントが記録されていない場合は何もしない
@@ -105,7 +101,6 @@ export class Looper {
         this.isRecording = false;
         this.isPlaying = false;
         this.recordStartTime = 0;
-        this.recordStartBeat = 0;
         this.loopDuration = 0;
         this.loopStartTime = 0;
     }

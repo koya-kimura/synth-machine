@@ -104,7 +104,6 @@ export const uiInfo: UIDrawFunction = (
 
   // 右下：シンセサイザーパラメータ情報
   tex.push();
-  const synthInfoWidth = tex.width * 0.3;
   const synthInfoX = margin;
   const synthInfoY = tex.height - margin - 200; // 下から200pxの位置
 

@@ -1,8 +1,6 @@
 import p5 from "p5";
 import { BaseSynthObject, CircleSynthObject } from "../object";
 import { UniformRandom } from "../../utils/math/uniformRandom";
-import { map } from "../../utils/math/mathUtils";
-import { easeOutQuad } from "../../utils/math/easing";
 
 /**
  * プリセット: percussion03
@@ -18,7 +16,6 @@ export const percussion03 = (p: p5, bpm: number, startTime: number): BaseSynthOb
             const x = p.width * ((j + 0.5) / m);
             const y = p.height * ((i + 0.5) / n)
             const s = p.height * 0.5 / n;
-            const r = map(UniformRandom.rand(i, startTime), 0, 1, 1.0, 7.0);
 
             objects.push(
                 new CircleSynthObject({

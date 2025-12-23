@@ -1,5 +1,5 @@
-import p5 from "p5";
-import type { SynthParams, ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams, SynthObjectConfig, StyleParams } from "./synthTypes";
+import type p5 from "p5";
+import type { ADSRPhase, MovementParams, EasingFunction, ResolvedSynthParams, SynthObjectConfig } from "./synthTypes";
 import { beatsToMs, resolveSynthParams } from "./synthTypes";
 import { linear } from "../utils/math/easing";
 import { getSynthColorHSB, type SynthColorKey } from "../utils/color/colorPalette";

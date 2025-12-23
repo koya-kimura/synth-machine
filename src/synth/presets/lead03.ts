@@ -2,8 +2,6 @@ import p5 from "p5";
 import { BaseSynthObject, RectSynthObject, CircleSynthObject } from "../object";
 import { UniformRandom } from "../../utils/math/uniformRandom";
 import { map } from "../../utils/math/mathUtils";
-import { easeOutQuad } from "../../utils/math/easing";
-import { shuffle } from "../../utils/math/array";
 
 /**
  * プリセット: lead03

@@ -1,8 +1,6 @@
 import p5 from "p5";
 import { BaseSynthObject, RectSynthObject } from "../object";
-import { UniformRandom } from "../../utils/math/uniformRandom";
 import { map } from "../../utils/math/mathUtils";
-import { easeOutQuad } from "../../utils/math/easing";
 
 /**
  * プリセット: snare02

@@ -36,7 +36,7 @@ export class PatternPlayer {
      * @param deltaTime フレーム間の経過時間（ミリ秒）
      * @returns 再生すべきプリセットインデックスの配列
      */
-    getEventsToPlay(currentBeat: number, deltaTime: number = 16): number[] {
+    getEventsToPlay(currentBeat: number, _deltaTime: number = 16): number[] {
         if (!this.currentPattern || this.currentPattern.events.length === 0) {
             return [];
         }
@@ -51,8 +51,8 @@ export class PatternPlayer {
 
         // deltaTimeからビート範囲を計算（BPM120で1秒=2ビート）
         // 例: 16ms @ 120BPM = 約0.032ビート
-        const bpm = 120; // 仮のBPM。本来はBPMManagerから取得すべきだが、ここでは固定
-        const beatRange = (deltaTime / 1000) * (bpm / 60);
+        // const bpm = 120; // 仮のBPM。本来はBPMManagerから取得すべきだが、ここでは固定
+        // const beatRange = (deltaTime / 1000) * (bpm / 60);
 
         // 前回のビートから現在のビートまでの範囲でイベントをチェック
         const prevBeat = this.lastProcessedBeat < 0 ? normalizedBeat : this.lastProcessedBeat;

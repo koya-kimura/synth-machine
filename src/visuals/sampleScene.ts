@@ -4,7 +4,7 @@ import { zigzag } from "../utils/math/mathUtils";
 
 export class sampleScene {
     draw(ctx: VisualRenderContext): void {
-        const { p, tex, midiManager, beat, audioManager, captureManager, font } = ctx;
+        const { p, tex, beat, audioManager } = ctx;
 
         const d = map(audioManager?.getVolume() || 0, 0, 1, 0.3, 0.9) * Math.min(tex.width, tex.height);
         const b = map(zigzag(beat), 0, 1, 0, 255);

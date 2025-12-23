@@ -1,7 +1,5 @@
 import p5 from "p5";
 import { BaseSynthObject, RectSynthObject } from "../object";
-import { UniformRandom } from "../../utils/math/uniformRandom";
-import { map } from "../../utils/math/mathUtils";
 import { easeOutQuad } from "../../utils/math/easing";
 
 /**
@@ -17,7 +15,6 @@ export const lead07 = (p: p5, bpm: number, startTime: number): BaseSynthObject[]
         const x = p.width * 0.5;
         const y = p.height * 0.5;
         const s = Math.min(p.width, p.height) * 0.1;
-        const r = map(UniformRandom.rand(i, startTime), 0, 1, 1.0, 7.0);
 
         objects.push(
             new RectSynthObject({
